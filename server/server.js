@@ -13,19 +13,7 @@ connectDB();
 app.use(express.json());
 securityMiddleware(app);
 
-// app.use((req, res, next) => {
-//     if (req.url.endsWith('.jsx')) {
-//       res.type('application/javascript');
-//     }
-//     next();
-//   });
-
 // Routes
-// app.get("/", (req, res) => {
-//     // console.log("Server is running!");
-//     res.json({ message: "API is running!" });
-// });
-
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 5000;
