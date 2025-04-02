@@ -10,7 +10,7 @@ const Navbar = () => {
           <li><a href="#hero">Home</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
-          <li><a href="#login">Login</a></li>
+          <li><a href="/login">Login</a></li>
         </ul>
       </nav>
     </header>
