@@ -9,17 +9,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log("Logging in with", email, password);
-//     // Add authentication logic here
-//     navigate("/dashboard"); // Redirect to landing page after login
-//   };
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(email+" "+password);
-        loginHandleSubmit(email, password, navigate);
-    };
+  const handleSubmit = (e) => {
+      e.preventDefault();
+      console.log(email+" "+password);
+      loginHandleSubmit(email, password, navigate);
+  };
   
   return (
     <div className="login-container">
