@@ -12,7 +12,7 @@ export const loginHandleSubmit = async (email, password, navigate) => {
   
       if (response.ok) {
         console.log("Login successful:", data);
-        localStorage.setItem("token", data.token); // Store authentication token
+        // localStorage.setItem("token", data.token); // Store authentication token
         navigate("/dashboard"); // Redirect to dashboard
       } else {
         console.error("Login failed:", data.message);

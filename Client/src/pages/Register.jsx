@@ -1,24 +1,20 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import InputField from "../components/Form/form";
-import { loginHandleSubmit } from "../services/loginHandleSubmit";
+import { registerHandleSubmit } from "../services/registerHandleSubmit";
 
-function Login() {
+function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     console.log("Logging in with", email, password);
-//     // Add authentication logic here
-//     navigate("/dashboard"); // Redirect to landing page after login
-//   };
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(email+" "+password);
-        loginHandleSubmit(email, password, navigate);
+        registerHandleSubmit(name,email, password, confirmPassword, navigate);
     };
   
   return (
@@ -27,16 +23,15 @@ function Login() {
         <h2>Welcome Back</h2>
         <p>Login to continue your journey through time.</p>
         <form onSubmit={handleSubmit}>
+          <InputField label="Name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
           <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           <InputField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          <button type="submit" className="btn">Login</button>
-          <p className="signup-text">
-            Don't have an account? <Link to="/register">Sign Up</Link>
-          </p>
+          <InputField label="Confirm Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+          <button type="submit" className="btn">Register</button>
         </form>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default Register;
