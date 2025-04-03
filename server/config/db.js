@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import 'dotenv/config';
+import pkg from 'pg';
 
-dotenv.config();
+const { Pool } = pkg;
 
 const connectDB = async () => {
   try {
@@ -16,4 +17,18 @@ const connectDB = async () => {
   }
 };
 
-export default connectDB;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+pool.connect()
+  .then(client => {
+    console.log('✅ Connected to PostgreSQL successfully!');
+    client.release(); // Release client back to the pool
+  })
+  .catch(err => {
+    console.error('❌ PostgreSQL connection error:', err.message);
+    process.exit(1); // Exit the app if DB connection fails
+  });
+
+export {connectDB, pool};

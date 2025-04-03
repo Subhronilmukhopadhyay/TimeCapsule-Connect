@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import connectDB from './config/db.js';
+import {connectDB, pool} from './config/db.js';
 import securityMiddleware from './middleware/security.js';
 import authRoutes from './routes/authRoutes.js';
 
