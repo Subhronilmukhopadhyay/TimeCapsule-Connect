@@ -7,15 +7,21 @@ import { registerHandleSubmit } from "../services/registerHandleSubmit";
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(email+" "+password);
-        registerHandleSubmit(name,email, password, confirmPassword, navigate);
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    console.log(email + " " + password);
+    registerHandleSubmit(name, email, phoneNo, password, confirmPassword, dateOfBirth, navigate);
+  };
   
   return (
     <div className="login-container">
@@ -25,6 +31,8 @@ function Register() {
         <form onSubmit={handleSubmit}>
           <InputField label="Name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
           <InputField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <InputField label="Phone Number" type="tel" value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} />
+          <InputField label="Date of Birth" type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
           <InputField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           <InputField label="Confirm Password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           <button type="submit" className="btn">Register</button>

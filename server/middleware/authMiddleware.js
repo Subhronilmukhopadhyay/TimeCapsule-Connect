@@ -6,10 +6,15 @@ import 'dotenv/config';
 // ✅ User Registration
 export const registerUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    console.log(req.body);
+    const { username, email, phoneNo, password, confirmPassword, dateOfBirth } = req.body;
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
 
     // ✅ Check if user already exists (Prevents duplicate registrations)
-    const checkUserQuery = 'SELECT id FROM users WHERE email = $1';
+    const checkUserQuery = 'SELECT id FROM UserLogin WHERE email = $1';
     const existingUser = await pool.query(checkUserQuery, [email]);
 
     if (existingUser.rows.length > 0) {
@@ -20,8 +25,8 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // ✅ Insert new user into the database (Prevent SQL injection with parameterized query)
-    const insertUserQuery = 'INSERT INTO UserLogin (email, password) VALUES ($1, $2) RETURNING id';
-    const newUser = await pool.query(insertUserQuery, [email, hashedPassword]);
+    const insertUserQuery = 'INSERT INTO userlogin (username, email, phone_no, password, Date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id';
+    const newUser = await pool.query(insertUserQuery, [username, email, phoneNo, hashedPassword, dateOfBirth]);
 
     const token = jwt.sign({ id: newUser.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
