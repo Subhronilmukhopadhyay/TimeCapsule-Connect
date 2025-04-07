@@ -20,6 +20,10 @@ export const registerHandleSubmit = async (name, username, email, phoneNo, passw
     }
     catch(error){
         console.error("Error registering:", error);
-        alert("An error occurred. Please try again later.");
+        if (error.response && error.response.data && error.response.data.error) {
+            alert(error.response.data.error); 
+        } else {
+            alert("An error occurred. Please try again later.");
+        }
     }
 }

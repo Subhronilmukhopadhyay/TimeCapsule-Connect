@@ -15,10 +15,18 @@ export const registerUser = async (req, res) => {
 
     // ✅ Check if user already exists (Prevents duplicate registrations)
     const checkUserQuery = 'SELECT id FROM userlogin WHERE email = $1';
-    const existingUser = await pool.query(checkUserQuery, [email]);
+    const existingEmail = await pool.query(checkUserQuery, [email]);
 
-    if (existingUser.rows.length > 0) {
+    if (existingEmail.rows.length > 0) {
       return res.status(400).json({ error: 'Email already in use' });
+    }
+
+    // ✅ Check if username already exists
+    const usernameCheckQuery = 'SELECT id FROM userlogin WHERE username = $1';
+    const existingUsername = await pool.query(usernameCheckQuery, [username]);
+
+    if (existingUsername.rows.length > 0) {
+      return res.status(400).json({ error: 'Username already in use' });
     }
 
     // ✅ Hash the password securely
