@@ -43,7 +43,7 @@ router.post('/register', validateRegister, registerUser);
 
 router.post('/login', validateLogin, loginUser);
 
-router.post('/register', validateLogin, loginUser);
+// router.post('/register', validateLogin, loginUser);
 
 
 export default router;
