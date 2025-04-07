@@ -1,8 +1,8 @@
 import axios from "axios";
-export const registerHandleSubmit = async (username, email, phoneNo, password, confirmPassword, dateOfBirth, navigate) => {
+export const registerHandleSubmit = async (name, username, email, phoneNo, password, confirmPassword, dateOfBirth, navigate) => {
     try{
         const result = await axios.post("http://localhost:8000/api/auth/register", {
-            username, email, phoneNo, password, confirmPassword, dateOfBirth
+            name, username, email, phoneNo, password, confirmPassword, dateOfBirth
         },
         {
             headers: {

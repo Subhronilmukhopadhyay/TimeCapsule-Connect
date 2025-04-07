@@ -7,14 +7,14 @@ import 'dotenv/config';
 export const registerUser = async (req, res) => {
   try {
     console.log(req.body);
-    const { username, email, phoneNo, password, confirmPassword, dateOfBirth } = req.body;
+    const { name, username, email, phoneNo, password, confirmPassword, dateOfBirth } = req.body;
 
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
     // ✅ Check if user already exists (Prevents duplicate registrations)
-    const checkUserQuery = 'SELECT id FROM UserLogin WHERE email = $1';
+    const checkUserQuery = 'SELECT id FROM userlogin WHERE email = $1';
     const existingUser = await pool.query(checkUserQuery, [email]);
 
     if (existingUser.rows.length > 0) {
@@ -25,8 +25,8 @@ export const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // ✅ Insert new user into the database (Prevent SQL injection with parameterized query)
-    const insertUserQuery = 'INSERT INTO userlogin (username, email, phone_no, password, Date_of_birth) VALUES ($1, $2, $3, $4, $5) RETURNING id';
-    const newUser = await pool.query(insertUserQuery, [username, email, phoneNo, hashedPassword, dateOfBirth]);
+    const insertUserQuery = 'INSERT INTO userlogin (name, username, email, phone_no, password, date_of_birth) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id';
+    const newUser = await pool.query(insertUserQuery, [name, username, email, phoneNo, hashedPassword, dateOfBirth]);
 
     const token = jwt.sign({ id: newUser.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
@@ -51,7 +51,7 @@ export const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     // ✅ Secure Query to Prevent SQL Injection
-    const query = 'SELECT id, email, password FROM UserLogin WHERE email = $1';
+    const query = 'SELECT id, email, password FROM userlogin WHERE email = $1';
     const { rows } = await pool.query(query, [email]);
 
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
@@ -59,8 +59,8 @@ export const loginUser = async (req, res) => {
     const user = rows[0];
 
     // ✅ Secure Password Hash Comparison
-    // const validPassword = await bcrypt.compare(password, user.password);
-    const validPassword = 1
+    const validPassword = await bcrypt.compare(password, user.password);
+    // const validPassword = 1
     if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
 
     // ✅ Secure JWT Token with HTTP-Only Cookie
