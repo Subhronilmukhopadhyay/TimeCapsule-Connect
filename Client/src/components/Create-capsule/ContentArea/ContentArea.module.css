@@ -1,0 +1,7 @@
+/* components/create-capsule/ContentArea.module.css */
+.contentArea {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

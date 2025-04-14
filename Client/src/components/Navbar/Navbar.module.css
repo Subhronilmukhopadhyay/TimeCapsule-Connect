@@ -1,11 +1,3 @@
-/* Basic Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Navbar.css */
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -19,38 +11,37 @@
   z-index: 1000;
 }
 
-.navbar .logo {
+.logo {
   font-size: 1.5em;
   font-weight: bold;
 }
 
-.navbar ul {
+.navList {
   list-style: none;
   display: flex;
 }
 
-.navbar ul li {
+.navList li {
   margin-left: 20px;
 }
 
-.navbar ul li a {
+.navList li a {
   text-decoration: none;
   color: #333;
   font-weight: 500;
 }
-  
-  @media (max-width: 768px) {
-    .navbar {
-      flex-direction: column;
-    }
-  
-    .navbar ul {
-      flex-direction: column;
-      margin-top: 10px;
-    }
-  
-    .navbar ul li {
-      margin: 10px 0;
-    }
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
   }
   
+  .navList {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  
+  .navList li {
+    margin: 10px 0;
+  }
+}

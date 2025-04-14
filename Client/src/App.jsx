@@ -1,8 +1,9 @@
 import { createBrowserRouter,RouterProvider } from 'react-router'
 import Home from './pages/Home'
 import Login from './pages/Login'
-import './App.css'
 import Register from './pages/Register';
+import TimeCapsulePage from './pages/TimeCapsulePage';
+import './App.css'
 
 // Define Routes with Loaders & Actions
 const router = createBrowserRouter([
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
   {
     path: "/register",
     element: <Register />
+  },
+  {
+    path: '/create-capsule',
+    element: <TimeCapsulePage />
   },
 ]);
 

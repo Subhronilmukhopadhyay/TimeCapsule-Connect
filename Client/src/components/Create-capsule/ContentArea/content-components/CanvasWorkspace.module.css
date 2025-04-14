@@ -1,0 +1,26 @@
+/* components/create-capsule/CanvasWorkspace.module.css */
+.canvasContainer {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+  }
+  
+  .canvasWorkspace {
+    width: 100%;
+    min-height: 100%;
+    background-color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: auto;
+    padding: 40px;
+  }
+  
+  .canvasWorkspace h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+  }
+  
+  .canvasWorkspace p {
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }

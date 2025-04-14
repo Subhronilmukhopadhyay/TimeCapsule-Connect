@@ -1,0 +1,73 @@
+/* components/create-capsule/Navbar.module.css */
+.navbar {
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.navLeft {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 18px;
+  color: #4a6ef5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.capsuleTitle {
+  display: flex;
+  align-items: center;
+}
+
+.capsuleName {
+  padding: 8px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  width: 250px;
+  font-size: 16px;
+}
+
+.navRight {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.capsuleActions {
+  display: flex;
+  gap: 10px;
+}
+
+.capsuleBtn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.previewBtn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.lockBtn {
+  background-color: #4a6ef5;
+  color: white;
+}
+
+.lockBtn:hover {
+  background-color: #345bdb;
+}

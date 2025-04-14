@@ -1,0 +1,86 @@
+/* components/create-capsule/sidebar/Collaborators.module.css */
+.collaboratorsSection {
+  margin-bottom: 30px;
+}
+
+.collaboratorsTitle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.collaboratorsTitle h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.toolBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.collaboratorsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.collaborator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.collaboratorAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #4a6ef5;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.collaboratorInfo {
+  flex: 1;
+}
+
+.collaboratorName {
+  font-weight: 500;
+}
+
+.collaboratorStatus {
+  font-size: 12px;
+  color: #666;
+}
+
+.addCollaboratorBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: white;
+  border: 1px dashed #999;
+  color: #666;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.addCollaboratorBtn:hover {
+  background-color: #f5f5f5;
+}

@@ -1,0 +1,38 @@
+.features {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.features h2 {
+  margin-bottom: 40px;
+  font-size: 2em;
+}
+
+.featureList {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.featureItem {
+  flex: 1 1 300px;
+  margin: 20px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.featureItem img {
+  width: 60px;
+  margin-bottom: 20px;
+}
+
+.featureItem h3 {
+  margin-bottom: 10px;
+}
+
+.featureItem p {
+  font-size: 0.95em;
+}

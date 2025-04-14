@@ -5,12 +5,12 @@ import Footer from '../components/Footer/Footer';
 import Features from "../components/Features/Features";
 import HowItWorks from "../components/HowItWorks/HowItWorks";
 import Testimonials from "../components/Testimonial/Testimonial";
-import '../styles/Home.css'
+import styles from '../styles/Home.module.css'
 
 const Home = () => {
   return (
     <>
-      <div>
+      <div className={styles.container}>
         <Navbar />
         <Hero />
         <Features />

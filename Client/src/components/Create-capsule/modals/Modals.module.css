@@ -1,0 +1,155 @@
+/* components/create-capsule/modals/Modals.module.css */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modalHeader h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+}
+
+.lockSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.settingGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settingGroup label {
+  font-weight: 500;
+}
+
+.settingGroup input,
+.settingGroup select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.messageInput {
+  padding: 10px;
+  height: 80px;
+}
+
+.recipientsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.selectedRecipients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recipientTag {
+  background-color: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.removeRecipient {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.privacySelect {
+  width: 100%;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.modalBtn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancelBtn {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.confirmBtn {
+  background-color: #4a6ef5;
+  color: white;
+}
+
+.previewModal .modalContent {
+  width: 800px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.previewContent {
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.previewContent h1 {
+  margin-bottom: 20px;
+}
+
+.previewContent p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}

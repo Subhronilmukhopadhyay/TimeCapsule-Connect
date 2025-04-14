@@ -1,17 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import './Navbar.css';
+import styles from './Navbar.module.css';
 
 const Navbar = () => {
   return (
-    <header className="navbar">
-      <div className="logo">TimeCapsule Connect</div>
+    <header className={styles.navbar}>
+      <div className={styles.logo}>TimeCapsule Connect</div>
       <nav>
-        <ul>
+        <ul className={styles.navList}>
           <li><a href="#hero">Home</a></li>
           <li><a href="#features">Features</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
-          <li><Link to='/login'>Login</Link></li>
+          <li><a href="/login">Login</a></li>
         </ul>
       </nav>
     </header>

@@ -1,0 +1,32 @@
+/* components/create-capsule/sidebar/Colors.module.css */
+.toolSection {
+    margin-bottom: 15px;
+  }
+  
+  .toolSection h3 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .colorRow {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  
+  .colorOptions {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .colorBtn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+  }

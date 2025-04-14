@@ -1,0 +1,85 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 500px;
+    max-width: 90%;
+  }
+  
+  .modal-content h2 {
+    margin-bottom: 15px;
+  }
+  
+  .lock-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .setting-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .setting-group label {
+    font-weight: 500;
+  }
+  
+  .setting-group input, .setting-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+  }
+  
+  .modal-btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .cancel-btn {
+    background-color: #f0f0f0;
+    color: #333;
+  }
+  
+  .confirm-btn {
+    background-color: #4a6ef5;
+    color: white;
+  }
+  
+  .preview-modal .modal-content {
+    width: 800px;
+    max-width: 90%;
+    max-height: 90vh;
+    overflow: auto;
+  }
+  
+  .preview-capsule {
+    background-color: #f9f9f9;
+    padding: 30px;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
