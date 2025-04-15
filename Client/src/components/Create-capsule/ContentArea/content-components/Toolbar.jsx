@@ -1,28 +1,35 @@
 // components/create-capsule/Toolbar.jsx
 import React from 'react';
 import { useSlate } from 'slate-react';
-import { toggleMark, toggleBlock, isMarkActive, isBlockActive } from '../../../../services/editor-utils';
+import { toggleMark, toggleBlock, isMarkActive, isBlockActive, undo, redo } from '../../../../services/editor-utils';
 import styles from './Toolbar.module.css';
 
-const ToolButton = ({ title, format, icon, children, type = 'mark' }) => {
+const ToolButton = ({ title, format, icon, children, type = 'mark', onClick }) => {
   const editor = useSlate();
   
   const isActive = type === 'mark' 
     ? isMarkActive(editor, format)
     : isBlockActive(editor, format);
 
-  return (
-    <button 
-      className={`${styles.toolBtn} ${isActive ? styles.active : ''}`} 
-      title={title}
-      onMouseDown={event => {
-        event.preventDefault();
+    const handleMouseDown = event => {
+      event.preventDefault();
+      if (onClick) {
+        // Custom click handler (e.g. undo/redo)
+        onClick(editor);
+      } else {
         if (type === 'mark') {
           toggleMark(editor, format);
         } else {
           toggleBlock(editor, format);
         }
-      }}
+      }
+    };
+
+  return (
+    <button 
+      className={`${styles.toolBtn} ${isActive ? styles.active : ''}`} 
+      title={title}
+      onMouseDown={handleMouseDown}
     >
       {icon ? (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -46,7 +53,7 @@ const Toolbar = () => {
             <path d="M4 9h14a4 4 0 0 1 0 8h-5" />
           </>
         }
-        onClick={() => undo(editor)}
+        onClick={undo}
       />
 
       <ToolButton 
@@ -57,7 +64,7 @@ const Toolbar = () => {
             <path d="M20 9H6a4 4 0 0 0 0 8h5" />
           </>
         }
-        onClick={() => redo(editor)}
+        onClick={redo}
       />
       
       <Divider />

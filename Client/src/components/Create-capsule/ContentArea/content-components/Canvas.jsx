@@ -1,11 +1,33 @@
 // components/create-capsule/CanvasWorkspace.jsx
 import React, { useCallback, useState } from 'react';
-import { Slate, Editable, useSelected, useFocused } from 'slate-react';
-import { Transforms, Editor, Element, Node } from 'slate';
-import { useEditor } from '../../../../services/EditorContext'; // Updated import for custom hook
-import { withHistory } from 'slate-history';
+import isHotkey from 'is-hotkey';
+import { Editable } from 'slate-react';
+import { Transforms, Editor } from 'slate';
+import { useEditor } from '../../../../services/EditorContext';
 import styles from './CanvasWorkspace.module.css';
 import MediaElement from './MediaElement';
+
+// Define hotkeys
+const HOTKEYS = {
+  'mod+b': 'bold',
+  'mod+i': 'italic',
+  'mod+u': 'underline',
+  'mod+`': 'code',
+};
+
+const toggleMark = (editor, format) => {
+  const isActive = isMarkActive(editor, format);
+  if (isActive) {
+    Editor.removeMark(editor, format);
+  } else {
+    Editor.addMark(editor, format, true);
+  }
+};
+
+const isMarkActive = (editor, format) => {
+  const marks = Editor.marks(editor);
+  return marks ? marks[format] === true : false;
+};
 
 // Define a helper to create a default paragraph element
 const createParagraphNode = () => ({
@@ -92,6 +114,16 @@ const CanvasWorkspace = () => {
   const handleKeyDown = useCallback(
     event => {
       if (!editor) return;
+
+      // 🔥 Handle formatting hotkeys
+      for (const hotkey in HOTKEYS) {
+        if (isHotkey(hotkey, event)) {
+          event.preventDefault();
+          const mark = HOTKEYS[hotkey];
+          toggleMark(editor, mark);
+          return;
+        }
+      }
       
       // Handle Enter key
       if (event.key === 'Enter') {

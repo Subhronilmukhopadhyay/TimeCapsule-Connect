@@ -1,5 +1,6 @@
 // components/create-capsule/modals/LockModal.jsx
 import React, { useState } from 'react';
+import { lockCapsule, saveCapsule } from '../../../services/capsule-storage';
 import styles from './Modals.module.css';
 
 const LockModal = ({ onClose }) => {
@@ -8,7 +9,21 @@ const LockModal = ({ onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Locking capsule with:', { lockDate, lockLocation });
+    
+    // First save the capsule
+    const capsuleId = saveCapsule(title, content);
+    
+    // Then lock it with the specified settings
+    const lockSettings = {
+      lockDate: lockDate,
+      lockLocation: lockLocation,
+      createdAt: new Date().toISOString()
+    };
+
+    lockCapsule(capsuleId, lockSettings);
+
+    // Show success message or redirect
+    alert('Your TimeCapsule has been successfully locked!');
     onClose();
   };
 
