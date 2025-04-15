@@ -1,8 +1,8 @@
-// components/create-capsule/Navbar.jsx
+// components/create-capsule/Navbar/NavBar.jsx
 import React from 'react';
 import styles from './Navbar.module.css';
 
-const Navbar = ({ onPreview, onLock }) => {
+const Navbar = ({ title, onTitleChange, onPreview, onLock }) => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.navLeft}>
@@ -15,7 +15,14 @@ const Navbar = ({ onPreview, onLock }) => {
         </div>
 
         <div className={styles.capsuleTitle}>
-          <input type="text" id="capsule-name" placeholder="Untitled Capsule" className={styles.capsuleName} />
+          <input 
+            type="text" 
+            id="capsule-name" 
+            placeholder="Untitled Capsule" 
+            className={styles.capsuleName}
+            value={title}
+            onChange={onTitleChange}
+          />
         </div>
       </div>
     

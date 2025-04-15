@@ -1,20 +1,119 @@
-// components/create-capsule/sidebar/MediaInsert.jsx
-import React from 'react';
+import React, { useRef } from 'react';
+import { useSlate } from 'slate-react';
+import { Transforms } from 'slate';
 import styles from './MediaInsert.module.css';
 
-const MediaButton = ({ icon, label }) => (
-  <button className={styles.actionBtn}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      {icon}
-    </svg>
-    {label}
-  </button>
-);
+const MediaButton = ({ icon, label, type }) => {
+  const editor = useSlate();
+  const fileInputRef = useRef(null);
+  
+  const handleInsert = () => {
+    // Trigger file input click to open file dialog
+    fileInputRef.current.click();
+  };
+  
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    // Create object URL for the uploaded file
+    const url = URL.createObjectURL(file);
+    
+    switch(type) {
+      case 'image':
+        insertImage(editor, url, file.name);
+        break;
+      case 'video':
+        insertVideo(editor, url, file.name);
+        break;
+      case 'audio':
+        insertAudio(editor, url, file.name);
+        break;
+      case 'file':
+        insertFile(editor, url, file.name);
+        break;
+    }
+    
+    // Reset file input
+    event.target.value = null;
+  };
+  
+  // Determine accepted file types based on the button type
+  const getAcceptedFileTypes = () => {
+    switch(type) {
+      case 'image': return 'image/*';
+      case 'video': return 'video/*';
+      case 'audio': return 'audio/*';
+      case 'file': return '.pdf,.doc,.docx,.txt';
+      default: return '';
+    }
+  };
+  
+  return (
+    <>
+      <button className={styles.actionBtn} onClick={handleInsert}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {icon}
+        </svg>
+        {label}
+      </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={getAcceptedFileTypes()}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
+    </>
+  );
+};
+
+// Updated insert functions to include file names
+const insertImage = (editor, url, name) => {
+  const image = { 
+    type: 'image', 
+    url, 
+    name,
+    children: [{ text: '' }] 
+  };
+  Transforms.insertNodes(editor, image);
+};
+
+const insertVideo = (editor, url, name) => {
+  const video = { 
+    type: 'video', 
+    url, 
+    name,
+    children: [{ text: '' }] 
+  };
+  Transforms.insertNodes(editor, video);
+};
+
+const insertAudio = (editor, url, name) => {
+  const audio = { 
+    type: 'audio', 
+    url, 
+    name,
+    children: [{ text: '' }] 
+  };
+  Transforms.insertNodes(editor, audio);
+};
+
+const insertFile = (editor, url, name) => {
+  const file = { 
+    type: 'file', 
+    url,
+    name, 
+    children: [{ text: '' }] 
+  };
+  Transforms.insertNodes(editor, file);
+};
 
 const MediaInsert = () => {
   const mediaOptions = [
     {
       label: "Insert Image",
+      type: "image",
       icon: (
         <>
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -25,6 +124,7 @@ const MediaInsert = () => {
     },
     {
       label: "Insert Video",
+      type: "video",
       icon: (
         <>
           <polygon points="23 7 16 12 23 17 23 7"></polygon>
@@ -34,6 +134,7 @@ const MediaInsert = () => {
     },
     {
       label: "Insert Audio",
+      type: "audio",
       icon: (
         <>
           <path d="M9 18V5l12-2v13"></path>
@@ -44,6 +145,7 @@ const MediaInsert = () => {
     },
     {
       label: "Insert File",
+      type: "file",
       icon: (
         <>
           <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
@@ -60,7 +162,11 @@ const MediaInsert = () => {
       
       {mediaOptions.map((option, index) => (
         <div key={index} className={index > 0 ? styles.mediaButtonSpacing : ''}>
-          <MediaButton icon={option.icon} label={option.label} />
+          <MediaButton 
+            icon={option.icon} 
+            label={option.label} 
+            type={option.type} 
+          />
         </div>
       ))}
     </div>

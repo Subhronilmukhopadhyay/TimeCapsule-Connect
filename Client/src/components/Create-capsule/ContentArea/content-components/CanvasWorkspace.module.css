@@ -1,26 +1,100 @@
 /* components/create-capsule/CanvasWorkspace.module.css */
 .canvasContainer {
-    flex: 1;
-    overflow: auto;
-    padding: 20px;
-  }
-  
-  .canvasWorkspace {
-    width: 100%;
-    min-height: 100%;
-    background-color: white;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    border-radius: 8px;
-    overflow: auto;
-    padding: 40px;
-  }
-  
-  .canvasWorkspace h1 {
-    margin-bottom: 20px;
-    font-size: 28px;
-  }
-  
-  .canvasWorkspace p {
-    margin-bottom: 15px;
-    line-height: 1.5;
-  }
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+.canvasWorkspace {
+  width: 100%;
+  min-height: 100%;
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  overflow: auto;
+  padding: 40px;
+}
+
+.canvasWorkspace h1 {
+  margin-bottom: 20px;
+  font-size: 28px;
+}
+
+.canvasWorkspace p {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+/* Image handling styles */
+.imageWrapper {
+  margin: 1rem 0;
+  position: relative;
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: #1976d2;
+  cursor: nwse-resize;
+  border-radius: 2px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.resizeHandle:hover {
+  opacity: 1;
+}
+
+.imageControls {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.75);
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+}
+
+.imageControls button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 2px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.imageControls button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.activeAlign {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.fileAttachment {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  margin: 8px 0;
+}
+
+.editorNotFound {
+  padding: 20px;
+  color: #d32f2f;
+  border: 1px dashed #d32f2f;
+  border-radius: 4px;
+  text-align: center;
+}

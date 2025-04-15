@@ -1,16 +1,37 @@
 // components/create-capsule/Toolbar.jsx
 import React from 'react';
+import { useSlate } from 'slate-react';
+import { toggleMark, toggleBlock, isMarkActive, isBlockActive } from '../../../../services/editor-utils';
 import styles from './Toolbar.module.css';
 
-const ToolButton = ({ title, children, icon }) => (
-  <button className={styles.toolBtn} title={title}>
-    {icon ? (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        {icon}
-      </svg>
-    ) : children}
-  </button>
-);
+const ToolButton = ({ title, format, icon, children, type = 'mark' }) => {
+  const editor = useSlate();
+  
+  const isActive = type === 'mark' 
+    ? isMarkActive(editor, format)
+    : isBlockActive(editor, format);
+
+  return (
+    <button 
+      className={`${styles.toolBtn} ${isActive ? styles.active : ''}`} 
+      title={title}
+      onMouseDown={event => {
+        event.preventDefault();
+        if (type === 'mark') {
+          toggleMark(editor, format);
+        } else {
+          toggleBlock(editor, format);
+        }
+      }}
+    >
+      {icon ? (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          {icon}
+        </svg>
+      ) : children}
+    </button>
+  );
+};
 
 const Divider = () => <div className={styles.divider} />;
 
@@ -25,6 +46,7 @@ const Toolbar = () => {
             <path d="M4 9h14a4 4 0 0 1 0 8h-5" />
           </>
         }
+        onClick={() => undo(editor)}
       />
 
       <ToolButton 
@@ -35,36 +57,36 @@ const Toolbar = () => {
             <path d="M20 9H6a4 4 0 0 0 0 8h5" />
           </>
         }
+        onClick={() => redo(editor)}
       />
       
       <Divider />
       
-      <ToolButton title="Paragraph">¶</ToolButton>
-      <ToolButton title="Font">Aa</ToolButton>
-      <ToolButton title="Bold"><strong>B</strong></ToolButton>
-      <ToolButton title="Italic"><em>I</em></ToolButton>
-      <ToolButton title="Underline"><u>U</u></ToolButton>
-      <ToolButton title="Strikethrough"><s>S</s></ToolButton>
-      <ToolButton title="Text Color" textColor="red">A</ToolButton>
-      <ToolButton title="Highlight" highlight>H</ToolButton>
+      <ToolButton title="Paragraph" format="paragraph" type="block">¶</ToolButton>
+      <ToolButton title="Bold" format="bold">
+        <strong>B</strong>
+      </ToolButton>
+      <ToolButton title="Italic" format="italic">
+        <em>I</em>
+      </ToolButton>
+      <ToolButton title="Underline" format="underline">
+        <u>U</u>
+      </ToolButton>
+      <ToolButton title="Strikethrough" format="strikethrough">
+        <s>S</s>
+      </ToolButton>
       
       <Divider />
       
-      <ToolButton title="Bullet List">•</ToolButton>
-      <ToolButton title="Numbered List">1.</ToolButton>
-      <ToolButton 
-        title="Decrease Indent" 
-        icon={<polyline points="15 6 9 12 15 18"></polyline>} 
-      />
-      <ToolButton 
-        title="Increase Indent" 
-        icon={<polyline points="9 6 15 12 9 18"></polyline>} 
-      />
+      <ToolButton title="Bullet List" format="bulleted-list" type="block">•</ToolButton>
+      <ToolButton title="Numbered List" format="numbered-list" type="block">1.</ToolButton>
+      <ToolButton title="Block Quote" format="block-quote" type="block">❞</ToolButton>
       
       <Divider />
       
       <ToolButton 
         title="Insert Link" 
+        format="link"
         icon={
           <>
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
