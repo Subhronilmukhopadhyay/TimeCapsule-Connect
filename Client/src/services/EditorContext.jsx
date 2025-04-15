@@ -9,7 +9,7 @@ export const EditorContext = createContext();
 
 export const EditorProvider = ({ children }) => {
   // Create a Slate editor object that won't change across renders
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = useMemo(() => withReact(withHistory(createEditor())), []);
   
   // Add the initial value when setting up our state.
   const [value, setValue] = useState([
