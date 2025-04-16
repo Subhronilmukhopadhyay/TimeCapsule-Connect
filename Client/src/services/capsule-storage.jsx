@@ -7,7 +7,7 @@ export const saveCapsule = (title, content) => {
       lastEdited: new Date().toISOString(),
       locked: false
     };
-    
+    console.log(capsule);
     // For now, store in localStorage. In production, this would be an API call
     const capsules = JSON.parse(localStorage.getItem('timeCapsules') || '[]');
     capsules.push(capsule);
@@ -24,7 +24,7 @@ export const saveCapsule = (title, content) => {
   export const lockCapsule = (id, lockSettings) => {
     const capsules = JSON.parse(localStorage.getItem('timeCapsules') || '[]');
     const index = capsules.findIndex(capsule => capsule.id === id);
-    
+    console.log(lockSettings);
     if (index !== -1) {
       capsules[index].locked = true;
       capsules[index].lockSettings = lockSettings;

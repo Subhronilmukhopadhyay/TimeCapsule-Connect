@@ -1,28 +1,82 @@
-// components/create-capsule/modals/LockModal.jsx
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
+import { useJsApiLoader } from '@react-google-maps/api';
 import { lockCapsule, saveCapsule } from '../../../services/capsule-storage';
+import DateSelector from './LockModal-components/DateSelector';
+import LocationInput from './LockModal-components/LocationInput';
+import MapComponent from './LockModal-components/MapComponent';
 import styles from './Modals.module.css';
+  
+const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
-const LockModal = ({ onClose }) => {
+const LockModal = ({ onClose, content, title }) => {
   const [lockDate, setLockDate] = useState('');
   const [lockLocation, setLockLocation] = useState('');
+  const [marker, setMarker] = useState(null);
+  const [mapCenter, setMapCenter] = useState(defaultCenter);
+
+  const autocompleteRef = useRef(null);
+  const mapRef = useRef(null);
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ['places'],
+  });
+
+  const onMapClick = useCallback((event) => {
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    setMarker({ lat, lng });
+    setMapCenter({ lat, lng });
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setLockLocation(results[0].formatted_address);
+      } else {
+        setLockLocation(`${lat}, ${lng}`);
+      }
+    });
+  }, []);
+
+  const handlePlaceChanged = () => {
+    const place = autocompleteRef.current.getPlace();
+    if (place?.geometry?.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setLockLocation(place.formatted_address);
+      setMarker({ lat, lng });
+      setMapCenter({ lat, lng });
+    }
+  };
+
+  const useCurrentLocation = () => {
+    navigator.geolocation?.getCurrentPosition((position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      setMarker({ lat, lng });
+      setMapCenter({ lat, lng });
+
+      const geocoder = new window.google.maps.Geocoder();
+      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          setLockLocation(results[0].formatted_address);
+        } else {
+          setLockLocation(`${lat}, ${lng}`);
+        }
+      });
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // First save the capsule
     const capsuleId = saveCapsule(title, content);
-    
-    // Then lock it with the specified settings
     const lockSettings = {
-      lockDate: lockDate,
-      lockLocation: lockLocation,
-      createdAt: new Date().toISOString()
+      lockDate,
+      lockLocation: lockLocation || (marker ? `${marker.lat}, ${marker.lng}` : ''),
+      coordinates: marker,
+      createdAt: new Date().toISOString(),
     };
-
     lockCapsule(capsuleId, lockSettings);
-
-    // Show success message or redirect
     alert('Your TimeCapsule has been successfully locked!');
     onClose();
   };
@@ -39,52 +93,24 @@ const LockModal = ({ onClose }) => {
           <div className={styles.modalBody}>
             <div className={styles.lockOptions}>
               <h3>Lock Configuration</h3>
-
-              <div className={styles.dateSelector}>
-                <h4>
-                  Select Unlock Date&nbsp;
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                </h4>
-                <input 
-                  type="date" 
-                  className={styles.datePicker}
-                  value={lockDate}
-                  onChange={(e) => setLockDate(e.target.value)}
-                  min={(new Date()).toISOString().split('T')[0]}
-                  required
-                />
-              </div>
-
-              <div className={styles.locationSelector}>
-                <h4>
-                  Set Unlock Location&nbsp;
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                </h4>
-                <input 
-                  type="text"
-                  className={styles.locationInput}
-                  placeholder="Enter address or landmark"
-                  value={lockLocation}
-                  onChange={(e) => setLockLocation(e.target.value)}
-                  required
-                />
-                <div className={styles.mapPlaceholder}>
-                  <div className={styles.map}>
-                    Map will go here
-                  </div>
-                </div>
-              </div>
+              <DateSelector lockDate={lockDate} setLockDate={setLockDate} />
+              <LocationInput
+                isLoaded={isLoaded}
+                autocompleteRef={autocompleteRef}
+                lockLocation={lockLocation}
+                setLockLocation={setLockLocation}
+                useCurrentLocation={useCurrentLocation}
+                handlePlaceChanged={handlePlaceChanged}
+              />
+              <MapComponent
+                isLoaded={isLoaded}
+                mapCenter={mapCenter}
+                marker={marker}
+                onMapClick={onMapClick}
+                mapRef={mapRef}
+              />
             </div>
           </div>
-
           <div className={styles.modalFooter}>
             <button type="button" className={styles.secondaryBtn} onClick={onClose}>Cancel</button>
             <button type="submit" className={styles.primaryBtn}>Lock Capsule</button>

@@ -44,7 +44,6 @@ const CreateCapsuleContent = () => {
         </div>
 
         <FloatingToolbar />
-        
         {showPreviewModal && (
           <PreviewModal 
             onClose={closePreviewModal} 
