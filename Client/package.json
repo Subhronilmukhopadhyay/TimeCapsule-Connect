@@ -16,6 +16,7 @@
     "@tiptap/react": "^2.11.7",
     "@tiptap/starter-kit": "^2.11.7",
     "axios": "^1.8.4",
+    "dompurify": "^3.2.5",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.487.0",
     "react": "^19.0.0",
