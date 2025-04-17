@@ -19,7 +19,7 @@ const MapComponent = ({ isLoaded, mapCenter, marker, onMapClick, mapRef }) => {
     streetViewControl: false,
     mapTypeControl: false,
     fullscreenControl: true,
-    mapId: 'c7ea447102af69e9'
+    mapId: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
   }), []);
 
   // Handle the advanced marker creation and cleanup

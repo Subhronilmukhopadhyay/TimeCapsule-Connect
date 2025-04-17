@@ -7,76 +7,59 @@ const LocationInput = ({
   setLockLocation,
   useCurrentLocation,
   onPlaceSelected,
-  placeAutocompleteRef
 }) => {
   const inputRef = useRef(null);
-  const wrapperRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
   useEffect(() => {
-    if (isLoaded && inputRef.current && window.google && window.google.maps && window.google.maps.places) {
+    if (
+      isLoaded &&
+      inputRef.current &&
+      window.google &&
+      window.google.maps &&
+      window.google.maps.places
+    ) {
       try {
-        // Clear any existing content
-        while (wrapperRef.current.firstChild) {
-          wrapperRef.current.removeChild(wrapperRef.current.firstChild);
-        }
-
-        // Create the PlaceAutocompleteElement correctly
-        const placeAutocompleteElement = new window.google.maps.places.PlaceAutocompleteElement({
-          inputElement: inputRef.current
+        // Initialize Google Autocomplete
+        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
+          fields: ['formatted_address', 'geometry'],
+          types: ['geocode'],
         });
 
-        // Store reference
-        placeAutocompleteRef.current = placeAutocompleteElement;
+        // Place selected event
+        autocompleteRef.current.addListener('place_changed', () => {
+          const place = autocompleteRef.current.getPlace();
+          if (!place || !place.geometry) return;
 
-        // Add event listener for place selection
-        placeAutocompleteElement.addEventListener('gmp-placeselect', (event) => {
-          const place = event.detail.place;
-          if (place) {
-            const formattedAddress = place.formattedAddress || place.formatted_address;
-            setLockLocation(formattedAddress || '');
-            onPlaceSelected(place);
-          }
+          const formattedAddress = place.formatted_address || '';
+          setLockLocation(formattedAddress);
+          onPlaceSelected(place);
         });
-
-        // Input change listener to update state
-        inputRef.current.addEventListener('input', (e) => setLockLocation(e.target.value));
-
-        // Append the PlaceAutocompleteElement to the wrapper
-        wrapperRef.current.appendChild(inputRef.current);
       } catch (error) {
-        console.error('Error initializing PlaceAutocompleteElement:', error);
+        console.error('Error initializing autocomplete:', error);
       }
     }
 
     return () => {
-      // Clean up if needed
-      if (placeAutocompleteRef.current) {
-        placeAutocompleteRef.current.remove();
+      if (autocompleteRef.current) {
+        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
       }
     };
-  }, [isLoaded, lockLocation, onPlaceSelected, setLockLocation]);
+  }, [isLoaded, onPlaceSelected, setLockLocation]);
 
   return (
     <div className={styles.locationSelector}>
       <h4>Set Unlock Location</h4>
 
-      <div ref={wrapperRef} className={styles.locationInputWrapper}>
-        {/* PlaceAutocompleteElement will be injected here */}
-        {!isLoaded && (
-          <input
-            type="text"
-            className={styles.locationInput}
-            placeholder="Loading place search..."
-            disabled
-          />
-        )}
+      <div className={styles.locationInputWrapper}>
         <input
           ref={inputRef}
           type="text"
           className={styles.locationInput}
-          placeholder="Search or click on the map"
+          placeholder={isLoaded ? 'Search or click on the map' : 'Loading place search...'}
           value={lockLocation}
           onChange={(e) => setLockLocation(e.target.value)}
+          disabled={!isLoaded}
           required
         />
       </div>
