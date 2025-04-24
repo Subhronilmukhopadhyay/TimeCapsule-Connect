@@ -33,16 +33,23 @@
 
 .resizeHandle {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #1976d2;
-  cursor: nwse-resize;
-  border-radius: 2px;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
 }
+
+/* Positioning handles */
+.topLeft { top: -6px; left: -6px; cursor: nwse-resize; }
+.top { top: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.topRight { top: -6px; right: -6px; cursor: nesw-resize; }
+.right { top: 50%; right: -6px; transform: translateY(-50%); cursor: ew-resize; }
+.bottomRight { bottom: -6px; right: -6px; cursor: nwse-resize; }
+.bottom { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.bottomLeft { bottom: -6px; left: -6px; cursor: nesw-resize; }
+.left { top: 50%; left: -6px; transform: translateY(-50%); cursor: ew-resize; }
 
 .resizeHandle:hover {
   opacity: 1;

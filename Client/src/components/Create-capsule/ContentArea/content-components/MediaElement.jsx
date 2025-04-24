@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { useSelected, useFocused } from 'slate-react';
 import { Editor, Transforms } from 'slate';
 import { EditorContext } from '../../../../services/EditorContext'; // Use EditorContext here
@@ -8,6 +8,7 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
   const selected = useSelected();
   const focused = useFocused();
   const { editor } = useContext(EditorContext); // Use the correct context
+  const isResizing = useRef(false);
 
   const [size, setSize] = useState({
     width: element.width || 'auto',
@@ -38,9 +39,11 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
     setPosition({ align });
   };
 
-  const handleResize = (e) => {
+  const handleResize =(direction) => (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    isResizing.current = true;
 
     const startX = e.clientX;
     const startY = e.clientY;
@@ -48,8 +51,26 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
     const startHeight = e.target.parentElement.offsetHeight;
 
     const handleMouseMove = (moveEvent) => {
-      const newWidth = startWidth + (moveEvent.clientX - startX);
-      const newHeight = startHeight + (moveEvent.clientY - startY);
+      if (!isResizing.current) return;
+      
+      let deltaX = moveEvent.clientX - startX;
+      let deltaY = moveEvent.clientY - startY;
+
+      let newWidth = startWidth;
+      let newHeight = startHeight;
+
+      if (['right', 'top-right', 'bottom-right'].includes(direction)) {
+        newWidth = startWidth + deltaX;
+      }
+      if (['left', 'top-left', 'bottom-left'].includes(direction)) {
+        newWidth = startWidth - deltaX;
+      }
+      if (['bottom', 'bottom-left', 'bottom-right'].includes(direction)) {
+        newHeight = startHeight + deltaY;
+      }
+      if (['top', 'top-left', 'top-right'].includes(direction)) {
+        newHeight = startHeight - deltaY;
+      }
 
       updateSize(Math.max(50, newWidth), Math.max(50, newHeight));
     };
@@ -102,20 +123,15 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
         {selected && focused && (
           <>
             {/* Resize Handle */}
-            <div
-              onMouseDown={handleResize}
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                width: '12px',
-                height: '12px',
-                background: '#1976d2',
-                cursor: 'nwse-resize',
-                borderRadius: '2px',
-              }}
-            />
-            {/* Alignment Buttons */}
+            <div className={styles.resizeHandle + ' ' + styles.topLeft} onMouseDown={handleResize('top-left')} />
+            <div className={styles.resizeHandle + ' ' + styles.top} onMouseDown={handleResize('top')} />
+            <div className={styles.resizeHandle + ' ' + styles.topRight} onMouseDown={handleResize('top-right')} />
+            <div className={styles.resizeHandle + ' ' + styles.right} onMouseDown={handleResize('right')} />
+            <div className={styles.resizeHandle + ' ' + styles.bottomRight} onMouseDown={handleResize('bottom-right')} />
+            <div className={styles.resizeHandle + ' ' + styles.bottom} onMouseDown={handleResize('bottom')} />
+            <div className={styles.resizeHandle + ' ' + styles.bottomLeft} onMouseDown={handleResize('bottom-left')} />
+            <div className={styles.resizeHandle + ' ' + styles.left} onMouseDown={handleResize('left')} />
+
             <div className={styles.imageControls}>
               <button onClick={() => updatePosition('left')}>Left</button>
               <button onClick={() => updatePosition('center')}>Center</button>

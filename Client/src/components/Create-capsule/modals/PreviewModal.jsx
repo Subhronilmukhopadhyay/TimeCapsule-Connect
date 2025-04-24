@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import { createEditor } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
 import styles from './Modals.module.css';
-import MediaElement from '../ContentArea/content-components/MediaElement';
+import ReadOnlyMediaElement from './PreviewModal-Components/ReadOnlyMediaElement';
 
 const PreviewModal = ({ onClose, content, title }) => {
    // Create a read-only editor for preview
@@ -18,7 +18,7 @@ const PreviewModal = ({ onClose, content, title }) => {
       case 'video':
       case 'audio':
       case 'file':
-        return <MediaElement {...props} mediaType={type} />;
+        return <ReadOnlyMediaElement {...props} mediaType={type} />;
       case 'heading-one':
         return <h1 {...props.attributes}>{props.children}</h1>;
       case 'heading-two':
