@@ -14,7 +14,6 @@ const ToolButton = ({ title, format, icon, children, type = 'mark', onClick }) =
     const handleMouseDown = event => {
       event.preventDefault();
       if (onClick) {
-        // Custom click handler (e.g. undo/redo)
         onClick(editor);
       } else {
         if (type === 'mark') {

@@ -24,7 +24,6 @@
   max-height: 90vh;
 }
 
-/* Apply larger width when in previewModal */
 .previewModal .modalContent {
   width: 800px;
   max-width: 95%;

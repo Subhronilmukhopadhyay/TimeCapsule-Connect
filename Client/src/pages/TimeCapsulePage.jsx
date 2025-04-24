@@ -47,7 +47,7 @@ const CreateCapsuleContent = () => {
         {showPreviewModal && (
           <PreviewModal 
             onClose={closePreviewModal} 
-            content={value} // Pass the current editor content
+            content={value} 
             title={capsuleTitle}
           />
         )}

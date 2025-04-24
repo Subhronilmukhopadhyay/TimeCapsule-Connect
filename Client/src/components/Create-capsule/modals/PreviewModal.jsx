@@ -6,10 +6,7 @@ import styles from './Modals.module.css';
 import ReadOnlyMediaElement from './PreviewModal-Components/ReadOnlyMediaElement';
 
 const PreviewModal = ({ onClose, content, title }) => {
-   // Create a read-only editor for preview
    const editor = React.useMemo(() => withReact(createEditor()), []);
-
-  // The renderElement and renderLeaf functions would be similar to the main editor
   const renderElement = useCallback(props => {
     const type = props.element.type;
     
@@ -92,7 +89,6 @@ const PreviewModal = ({ onClose, content, title }) => {
         </div>
         
         <div className={styles.previewContent}>
-          {/* Render preview content here */}
           <div className={styles.previewDocument}>
             <h1>{title}</h1>
             <Slate

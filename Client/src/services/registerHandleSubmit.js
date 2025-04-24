@@ -2,7 +2,7 @@ import axios from "axios";
 export const registerHandleSubmit = async (name, username, email, phoneNo, password, confirmPassword, dateOfBirth, navigate) => {
     try{
         const csrfResponse = await fetch('http://localhost:8000/csrf-token', {
-            credentials: 'include' // include cookies in request
+            credentials: 'include'
         });
     
         if (!csrfResponse.ok) {

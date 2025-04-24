@@ -5,7 +5,6 @@ import Register from './pages/Register';
 import TimeCapsulePage from './pages/TimeCapsulePage';
 import './App.css'
 
-// Define Routes with Loaders & Actions
 const router = createBrowserRouter([
   {
     path: "/",

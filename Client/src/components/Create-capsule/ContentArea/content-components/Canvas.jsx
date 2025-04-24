@@ -7,7 +7,6 @@ import { useEditor } from '../../../../services/EditorContext';
 import styles from './CanvasWorkspace.module.css';
 import MediaElement from './MediaElement';
 
-// Define hotkeys
 const HOTKEYS = {
   'mod+b': 'bold',
   'mod+i': 'italic',
@@ -29,15 +28,13 @@ const isMarkActive = (editor, format) => {
   return marks ? marks[format] === true : false;
 };
 
-// Define a helper to create a default paragraph element
 const createParagraphNode = () => ({
   type: 'paragraph',
   children: [{ text: '' }]
 });
 
 const CanvasWorkspace = () => {
-  const { editor, value, setValue } = useEditor(); // Use custom hook to access context
-
+  const { editor } = useEditor(); 
   const renderElement = useCallback(props => {
     const type = props.element.type;
     
@@ -115,7 +112,6 @@ const CanvasWorkspace = () => {
     event => {
       if (!editor) return;
 
-      // 🔥 Handle formatting hotkeys
       for (const hotkey in HOTKEYS) {
         if (isHotkey(hotkey, event)) {
           event.preventDefault();
@@ -125,50 +121,39 @@ const CanvasWorkspace = () => {
         }
       }
       
-      // Handle Enter key
       if (event.key === 'Enter') {
         const { selection } = editor;
         
         if (selection) {
           const [node, path] = Editor.node(editor, selection);
           
-          // Find the closest block element to the cursor
           const [block, blockPath] = Editor.above(editor, {
             match: n => Editor.isBlock(editor, n),
           }) || [];
           
-          // Check if the block is a media element or its parent is
           if (block && ['image', 'video', 'audio', 'file'].includes(block.type)) {
             event.preventDefault();
             
-            // Insert a new paragraph after the media block
             Transforms.insertNodes(
               editor,
               createParagraphNode(),
               { at: [blockPath[0] + 1] }
             );
             
-            // Move the cursor to the new paragraph
             Transforms.select(editor, [blockPath[0] + 1, 0]);
             return;
           }
-          
-          // Also check if we're inside a wrapper that contains a media element
           const nodeEntry = Editor.parent(editor, path);
           if (nodeEntry) {
             const [parentNode, parentPath] = nodeEntry;
             
             if (parentNode && ['image', 'video', 'audio', 'file'].includes(parentNode.type)) {
               event.preventDefault();
-              
-              // Insert a new paragraph after the media block
               Transforms.insertNodes(
                 editor,
                 createParagraphNode(),
                 { at: [parentPath[0] + 1] }
               );
-              
-              // Move the cursor to the new paragraph
               Transforms.select(editor, [parentPath[0] + 1, 0]);
               return;
             }
