@@ -3,6 +3,7 @@ node_modules/
 
 # Environment variables
 .env
+Capsule-media-upload.json
 
 # Build files
 /client/build

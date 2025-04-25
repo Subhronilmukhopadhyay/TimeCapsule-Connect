@@ -1,0 +1,16 @@
+import express from 'express';
+import { createCapsule, updateCapsule, lockCapsule } from '../controllers/capsuleController.js'
+// import { authenticate } from '../controllers/authController.js'; //to authenticate the before post
+
+const router = express.Router();
+
+// Create a new capsule
+router.post('/', createCapsule);
+
+// Update a capsule (partial update)
+router.patch('/:id', updateCapsule);
+
+// Lock a capsule (partial update)
+router.patch('/:id/lock', lockCapsule);
+
+export default router;

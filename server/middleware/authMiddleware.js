@@ -4,7 +4,7 @@ import { pool } from '../config/db.js';
 import 'dotenv/config';
 export const registerUser = async (req, res) => {
   try {
-    console.log(req.body);
+    // console.log(req.body);
     const { name, username, email, phoneNo, password, confirmPassword, dateOfBirth } = req.body;
 
     if (password !== confirmPassword) {

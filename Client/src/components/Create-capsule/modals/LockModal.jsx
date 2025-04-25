@@ -5,9 +5,8 @@ import DateSelector from './LockModal-components/DateSelector';
 import LocationInput from './LockModal-components/LocationInput';
 import MapComponent from './LockModal-components/MapComponent';
 import styles from './Modals.module.css';
-import DOMPurify from 'dompurify'; // Add this library for sanitization
+import DOMPurify from 'dompurify'; //for sanitization
 
-// Define libraries outside component to prevent recreation on each render
 const libraries = ['places'];
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
@@ -21,7 +20,6 @@ const LockModal = ({ onClose, content, title }) => {
   const mapRef = useRef(null);
   const placeAutocompleteRef = useRef(null);
 
-  // Use Google Maps API securely
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,

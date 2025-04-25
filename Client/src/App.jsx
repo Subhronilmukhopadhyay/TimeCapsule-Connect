@@ -23,6 +23,10 @@ const router = createBrowserRouter([
     path: '/create-capsule',
     element: <TimeCapsulePage />
   },
+  {
+    path: '/create-capsule/:id',
+    element: <TimeCapsulePage />
+  },
 ]);
 
 function App() {

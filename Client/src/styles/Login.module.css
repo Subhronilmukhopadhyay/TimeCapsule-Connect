@@ -79,6 +79,12 @@
   text-decoration: underline;
 }
 
+.errorMessage {
+  color: red;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+}
+
 /* Media queries for responsiveness */
 @media (max-width: 480px) {
   .loginBox {

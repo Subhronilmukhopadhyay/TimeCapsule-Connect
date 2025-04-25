@@ -7,14 +7,17 @@ import { loginHandleSubmit } from "../services/loginHandleSubmit";
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(email + " " + password);
-    loginHandleSubmit(email, password, navigate);
+    const result = await loginHandleSubmit(email, password, navigate);
+    if (!result.success) {
+      setErrorMessage(result.message); 
+    }
   };
-  
+
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginBox}>
@@ -33,6 +36,11 @@ function Login() {
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
           />
+          
+          {errorMessage && (
+            <div className={styles.errorMessage}>{errorMessage}</div> 
+          )}
+
           <button type="submit" className={styles.btn}>Login</button>
           <p className={styles.signupText}>
             Don't have an account? <Link to="/register" className={styles.link}>Sign Up</Link>

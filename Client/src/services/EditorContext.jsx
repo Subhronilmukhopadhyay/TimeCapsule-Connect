@@ -1,20 +1,22 @@
 // context/EditorContext.js
-import React, { createContext, useState, useMemo, useContext, useEffect } from 'react';
+import React, { createContext, useState, useMemo, useContext, useEffect, useCallback } from 'react';
 import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
+import api from './api';
+import DOMPurify from 'dompurify';
 
 // Create a context for the editor
 export const EditorContext = createContext();
 
-export const EditorProvider = ({ children, initialId= null }) => {
-  // Create a Slate editor object that won't change across renders
+export const EditorProvider = ({ children, initialId = null }) => {
   const editor = useMemo(() => withReact(withHistory(createEditor())), []);
 
-  // Track the current capsule ID
   const [capsuleId, setCapsuleId] = useState(initialId);
-  
-  // Add the initial value when setting up our state.
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isModified, setIsModified] = useState(false);
+
   const [value, setValue] = useState([
     {
       type: 'heading-one',
@@ -33,44 +35,125 @@ export const EditorProvider = ({ children, initialId= null }) => {
       children: [{ text: 'This content will be locked until the date or location you specify.' }],
     },
   ]);
-  
+
   const [capsuleTitle, setCapsuleTitle] = useState('Untitled Capsule');
 
-  // Auto-save on value changes (debounced)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (capsuleId) {
-        // We'd call an update API here
-        console.log('Auto-saving capsule...', capsuleId);
-        // updateCapsule(capsuleId, capsuleTitle, value);
-      }
-    }, 2000); // Auto-save after 2 seconds of inactivity
-    
-    return () => clearTimeout(timeoutId);
-  }, [value, capsuleTitle, capsuleId]);
+  const sanitizeContent = (content) => {
+    return content.map(item => ({
+      ...item,
+      children: item.children.map(child => ({
+        ...child,
+        text: DOMPurify.sanitize(child.text),
+      })),
+    }));
+  };
 
-  // Load capsule if initialId is provided
-  useEffect(() => {
-    if (initialId) {
-      // We'd load from API here
-      // const capsule = loadCapsule(initialId);
-      // if (capsule) {
-      //   setCapsuleTitle(capsule.title);
-      //   setValue(capsule.content);
-      // }
+  const createCapsule = useCallback(async () => {
+    if (isModified && !capsuleId) {
+      try {
+        setIsLoading(true);
+        const sanitizedTitle = DOMPurify.sanitize(capsuleTitle);
+        const sanitizedContent = sanitizeContent(value);
+        // console.log(sanitizedContent);
+        const { data } = await api.post(`/create/capsule`, {
+          title: sanitizedTitle,
+          content: sanitizedContent,
+        });
+
+        const newCapsuleId = data.id;
+        setCapsuleId(newCapsuleId);
+
+        window.history.pushState(
+          { capsuleId: newCapsuleId },
+          '',
+          `/create-capsule/${newCapsuleId}`
+        );
+
+        return newCapsuleId;
+      } catch (err) {
+        setError(err?.response?.data?.message || 'Error creating new capsule');
+        console.error('Error creating new capsule:', err);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
     }
+    return capsuleId;
+  }, [isModified, capsuleId, capsuleTitle, value]);
+
+  useEffect(() => {
+    if (isModified && !capsuleId) {
+      createCapsule();
+    }
+  }, [isModified, capsuleId, createCapsule]);
+
+  useEffect(() => {
+    if (!isModified || !capsuleId) return;
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const sanitizedTitle = DOMPurify.sanitize(capsuleTitle);
+        const sanitizedContent = sanitizeContent(value);
+
+        await api.patch(`/create/capsule/${capsuleId}`, {
+          title: sanitizedTitle,
+          content: sanitizedContent,
+        });
+
+        console.log('Auto-saved capsule:', capsuleId);
+      } catch (err) {
+        console.error('Error auto-saving capsule:', err);
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeoutId);
+  }, [value, capsuleTitle, capsuleId, isModified]);
+
+  useEffect(() => {
+    const loadInitialCapsule = async () => {
+      if (initialId) {
+        try {
+          setIsLoading(true);
+          const { data } = await api.get(`/capsules/${initialId}`);
+          setCapsuleTitle(data.title);
+          setValue(data.content);
+        } catch (err) {
+          setError(err?.response?.data?.message || 'Error loading capsule');
+          console.error('Error loading capsule:', err);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadInitialCapsule();
   }, [initialId]);
-  
+
+  const handleValueChange = useCallback((newValue) => {
+    setValue(newValue);
+    if (!isModified) {
+      setIsModified(true);
+    }
+  }, [isModified]);
+
+  const handleTitleChange = useCallback((newTitle) => {
+    setCapsuleTitle(newTitle);
+    setIsModified(true);
+  }, []);
+
   const contextValue = {
     editor,
     value,
-    setValue,
+    setValue: handleValueChange,
     capsuleTitle,
-    setCapsuleTitle,
+    setCapsuleTitle: handleTitleChange,
     capsuleId,
-    setCapsuleId
+    setCapsuleId,
+    isModified,
+    isLoading,
+    error,
+    createCapsule,
   };
-  
+
   return (
     <EditorContext.Provider value={contextValue}>
       {children}
@@ -78,7 +161,6 @@ export const EditorProvider = ({ children, initialId= null }) => {
   );
 };
 
-// Custom hook to use the editor context
 export const useEditor = () => {
   const context = useContext(EditorContext);
   if (!context) {
