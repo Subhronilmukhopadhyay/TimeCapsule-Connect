@@ -1,4 +1,5 @@
 // components/create-capsule/Navbar/NavBar.jsx
+import { Link } from 'react-router-dom';
 import React from 'react';
 import styles from './Navbar.module.css';
 
@@ -6,13 +7,13 @@ const Navbar = ({ title, onTitleChange, onPreview, onLock }) => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.navLeft}>
-        <div className={styles.logo}>
+        <Link to="/" className={styles.logo}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
           TimeCapsule
-        </div>
+        </Link>
 
         <div className={styles.capsuleTitle}>
           <input 
