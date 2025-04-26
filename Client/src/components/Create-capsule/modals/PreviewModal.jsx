@@ -1,12 +1,14 @@
-// components/create-capsule/modals/PreviewModal.jsx
 import React, { useCallback } from 'react';
 import { createEditor } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
+import { useEditor } from '../../../services/EditorContext';
 import styles from './Modals.module.css';
 import ReadOnlyMediaElement from './PreviewModal-Components/ReadOnlyMediaElement';
 
-const PreviewModal = ({ onClose, content, title }) => {
-   const editor = React.useMemo(() => withReact(createEditor()), []);
+const PreviewModal = ({ onClose }) => {
+  const { capsuleTitle: title, value: content } = useEditor();
+  const editor = React.useMemo(() => withReact(createEditor()), []);
+  
   const renderElement = useCallback(props => {
     const type = props.element.type;
     

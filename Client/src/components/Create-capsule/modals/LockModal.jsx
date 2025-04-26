@@ -1,21 +1,24 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useJsApiLoader } from '@react-google-maps/api';
-import { lockCapsule, saveCapsule } from '../../../services/capsule-storage';
+import { saveCapsule, lockCapsule } from '../../../services/capsule-storage';
+import { useEditor } from '../../../services/EditorContext';
 import DateSelector from './LockModal-components/DateSelector';
 import LocationInput from './LockModal-components/LocationInput';
 import MapComponent from './LockModal-components/MapComponent';
 import styles from './Modals.module.css';
-import DOMPurify from 'dompurify'; //for sanitization
 
 const libraries = ['places'];
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
-const LockModal = ({ onClose, content, title }) => {
+const LockModal = ({ onClose }) => {
+  const { capsuleId, capsuleTitle, value, createCapsule } = useEditor();
+  
   const [lockDate, setLockDate] = useState('');
   const [lockLocation, setLockLocation] = useState('');
   const [marker, setMarker] = useState(null);
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const mapRef = useRef(null);
   const placeAutocompleteRef = useRef(null);
@@ -25,7 +28,6 @@ const LockModal = ({ onClose, content, title }) => {
     libraries,
   });
 
-  // Handle map clicks to set location
   const onMapClick = useCallback((event) => {
     try {
       const lat = event.latLng.lat();
@@ -47,7 +49,6 @@ const LockModal = ({ onClose, content, title }) => {
     }
   }, []);
 
-  // Get current location
   const useCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser');
@@ -80,11 +81,19 @@ const LockModal = ({ onClose, content, title }) => {
     );
   }, [isLoaded]);
 
-  // Handle form submission
-  const handleSubmit = useCallback((e) => {
+  const handlePlaceSelected = useCallback((place) => {
+    if (place && place.geometry && place.geometry.location) {
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
+      setLockLocation(place.formatted_address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      setMarker({ lat, lng });
+      setMapCenter({ lat, lng });
+    }
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
-    // Validate inputs
     if (!lockDate) {
       setError('Please select an unlock date');
       return;
@@ -96,18 +105,19 @@ const LockModal = ({ onClose, content, title }) => {
     }
     
     try {
-      // Sanitize inputs before saving
-      // console.log(content);
-      const sanitizedTitle = DOMPurify.sanitize(title);
-      const sanitizedContent = content
-      .map(item => {
-        if (item.value) {
-          return { ...item, value: DOMPurify.sanitize(item.value) };
+      setIsSubmitting(true);
+      setError('');
+      
+      let id = capsuleId;
+      if (!id) {
+        id = await createCapsule();
+        if (!id) {
+          throw new Error('Failed to save capsule');
         }
-        return item;
-      });
-      // console.log(sanitizedContent);
-      const capsuleId = saveCapsule(sanitizedTitle, sanitizedContent);
+      } else {
+        await saveCapsule(capsuleTitle, value, capsuleId);
+      }
+      
       const lockSettings = {
         lockDate,
         lockLocation: lockLocation || (marker ? `${marker.lat.toFixed(6)}, ${marker.lng.toFixed(6)}` : ''),
@@ -115,25 +125,18 @@ const LockModal = ({ onClose, content, title }) => {
         createdAt: new Date().toISOString(),
       };
       
-      lockCapsule(capsuleId, lockSettings);
+      await lockCapsule(id, lockSettings);
+      
       alert('Your TimeCapsule has been successfully locked!');
-      onClose();
+      
+      window.location.href = '/my-capsules';
     } catch (err) {
-      setError('Failed to save the capsule. Please try again.');
-      console.error('Error saving capsule:', err);
+      setError('Failed to lock the capsule. Please try again.');
+      console.error('Error locking capsule:', err);
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [lockDate, lockLocation, marker, title, content, onClose]);
-
-  // Handle place selection
-  const handlePlaceSelected = useCallback((place) => {
-    if (place && place.geometry && place.geometry.location) {
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setLockLocation(place.formatted_address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-      setMarker({ lat, lng });
-      setMapCenter({ lat, lng });
-    }
-  }, []);
+  }, [lockDate, lockLocation, marker, capsuleId, capsuleTitle, value, createCapsule]);
 
   if (loadError) {
     return (
@@ -186,8 +189,21 @@ const LockModal = ({ onClose, content, title }) => {
             </div>
           </div>
           <div className={styles.modalFooter}>
-            <button type="button" className={styles.secondaryBtn} onClick={onClose}>Cancel</button>
-            <button type="submit" className={styles.primaryBtn}>Lock Capsule</button>
+            <button 
+              type="button" 
+              className={styles.secondaryBtn} 
+              onClick={onClose} 
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className={styles.primaryBtn} 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Locking...' : 'Lock Capsule'}
+            </button>
           </div>
         </form>
       </div>

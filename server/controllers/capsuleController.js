@@ -81,12 +81,16 @@ export const lockCapsule = async (req, res) => {
         const { lockSettings } = req.body;
         const lockedCapsule = await Capsule.findByIdAndUpdate(
             req.params.id,
-            lockSettings,
+            {
+                locked: true,
+                ...lockSettings,
+            },
             { new: true }
         )
         if(!lockedCapsule) {
             return res.status(404).json({ error: 'Capsule not found' });
         }
+        return res.status(200).json({ success: true, capsule: lockedCapsule });
     } catch(error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });

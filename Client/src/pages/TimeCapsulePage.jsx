@@ -44,29 +44,22 @@ const CreateCapsuleContent = () => {
         </div>
 
         <FloatingToolbar />
+        
         {showPreviewModal && (
-          <PreviewModal 
-            onClose={closePreviewModal} 
-            content={value} 
-            title={capsuleTitle}
-          />
+          <PreviewModal onClose={closePreviewModal} />
         )}
         
         {showLockModal && (
-          <LockModal 
-            onClose={closeLockModal} 
-            content={value}
-            title={capsuleTitle}
-          />
+          <LockModal onClose={closeLockModal} />
         )}
       </div>
     </Slate>
   );
 };
 
-const CreateCapsule = () => {
+const CreateCapsule = ({ capsuleId }) => {
   return (
-    <EditorProvider>
+    <EditorProvider initialId={capsuleId}>
       <CreateCapsuleContent />
     </EditorProvider>
   );

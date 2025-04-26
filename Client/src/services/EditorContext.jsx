@@ -1,12 +1,9 @@
-// context/EditorContext.js
 import React, { createContext, useState, useMemo, useContext, useEffect, useCallback } from 'react';
 import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
-import api from './api';
-import DOMPurify from 'dompurify';
+import { saveCapsule, autoSaveCapsule, loadCapsule } from './capsule-storage';
 
-// Create a context for the editor
 export const EditorContext = createContext();
 
 export const EditorProvider = ({ children, initialId = null }) => {
@@ -38,41 +35,16 @@ export const EditorProvider = ({ children, initialId = null }) => {
 
   const [capsuleTitle, setCapsuleTitle] = useState('Untitled Capsule');
 
-  const sanitizeContent = (content) => {
-    return content.map(item => ({
-      ...item,
-      children: item.children.map(child => ({
-        ...child,
-        text: DOMPurify.sanitize(child.text),
-      })),
-    }));
-  };
-
   const createCapsule = useCallback(async () => {
-    if (isModified && !capsuleId) {
+    if (!capsuleId || isModified) {
       try {
         setIsLoading(true);
-        const sanitizedTitle = DOMPurify.sanitize(capsuleTitle);
-        const sanitizedContent = sanitizeContent(value);
-        // console.log(sanitizedContent);
-        const { data } = await api.post(`/create/capsule`, {
-          title: sanitizedTitle,
-          content: sanitizedContent,
-        });
-
-        const newCapsuleId = data.id;
+        const newCapsuleId = await saveCapsule(capsuleTitle, value, capsuleId);
         setCapsuleId(newCapsuleId);
-
-        window.history.pushState(
-          { capsuleId: newCapsuleId },
-          '',
-          `/create-capsule/${newCapsuleId}`
-        );
-
         return newCapsuleId;
       } catch (err) {
-        setError(err?.response?.data?.message || 'Error creating new capsule');
-        console.error('Error creating new capsule:', err);
+        setError(err?.response?.data?.message || 'Error saving capsule');
+        console.error('Error saving capsule:', err);
         return null;
       } finally {
         setIsLoading(false);
@@ -92,15 +64,7 @@ export const EditorProvider = ({ children, initialId = null }) => {
 
     const timeoutId = setTimeout(async () => {
       try {
-        const sanitizedTitle = DOMPurify.sanitize(capsuleTitle);
-        const sanitizedContent = sanitizeContent(value);
-
-        await api.patch(`/create/capsule/${capsuleId}`, {
-          title: sanitizedTitle,
-          content: sanitizedContent,
-        });
-
-        console.log('Auto-saved capsule:', capsuleId);
+        await autoSaveCapsule(capsuleId, capsuleTitle, value);
       } catch (err) {
         console.error('Error auto-saving capsule:', err);
       }
@@ -114,7 +78,7 @@ export const EditorProvider = ({ children, initialId = null }) => {
       if (initialId) {
         try {
           setIsLoading(true);
-          const { data } = await api.get(`/capsules/${initialId}`);
+          const data = await loadCapsule(initialId);
           setCapsuleTitle(data.title);
           setValue(data.content);
         } catch (err) {
