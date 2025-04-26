@@ -3,6 +3,7 @@ import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
+import authenticate from '../controllers/authController.js';
 
 const securityMiddleware = (app) => {
   app.use(helmet());
@@ -36,6 +37,10 @@ const securityMiddleware = (app) => {
   });
 
   app.use(limiter);
+
+  app.get('/me', authenticate, (req, res) => {
+    res.status(200).json({ id: req.user.id, email: req.user.email });
+  });
 };
 
 export default securityMiddleware;

@@ -1,41 +1,46 @@
-import { createBrowserRouter,RouterProvider } from 'react-router'
-import Home from './pages/Home'
-import Login from './pages/Login'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { authenticatedLoader } from './services/authenticatedLoader';
+import Home from './pages/Home';
+import Login from './pages/Login';
 import Register from './pages/Register';
 import TimeCapsulePage from './pages/TimeCapsulePage';
 import './App.css'
 
 const router = createBrowserRouter([
-  {
-    path: "/",
+  { 
+    path: '/', 
     element: <Home />,
-    // errorElement: <ErrorPage />,
+    // errorElement: <ErrorPage />, 
   },
-  {
-    path: "/login",
-    element: <Login />
+  { 
+    path: '/login', 
+    element: <Login /> 
   },
-  {
-    path: "/register",
-    element: <Register />
+  { 
+    path: '/register', 
+    element: <Register /> 
   },
+  // {
+  //   path: '/dashboard',
+  //   element: <Dashboard />,
+  //   loader: authenticatedLoader(),
+  // },
   {
     path: '/create-capsule',
-    element: <TimeCapsulePage />
+    element: <TimeCapsulePage />,
+    loader: authenticatedLoader(),
   },
   {
     path: '/create-capsule/:id',
-    element: <TimeCapsulePage />
+    element: <TimeCapsulePage />,
+    loader: authenticatedLoader(),
   },
 ]);
 
-function App() {
-
+export default function App() {
   return (
     <>
       <RouterProvider router={router} />
     </>
   )
 }
-
-export default App;
