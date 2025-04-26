@@ -11,7 +11,6 @@ import { detectMediaChanges } from '../config/googleDrive.js';
  */
 export const createCapsule = async (req, res) => {
     try {
-        console.log(req.body);
         const { title, content } = req.body;
         // console.log('HERE'+'1'+content);
         // console.log(content);
@@ -41,7 +40,6 @@ export const createCapsule = async (req, res) => {
  */
 export const updateCapsule = async (req, res) => {
     try {
-        console.log(req.body);
         const { title, content } = req.body;
 
         const existingCapsule = await Capsule.findById(req.params.id);
@@ -77,7 +75,6 @@ export const updateCapsule = async (req, res) => {
 
 export const lockCapsule = async (req, res) => {
     try {
-        console.log(req.body);
         const { lockSettings } = req.body;
         const lockedCapsule = await Capsule.findByIdAndUpdate(
             req.params.id,

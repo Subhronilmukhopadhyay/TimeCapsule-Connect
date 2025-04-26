@@ -1,8 +1,9 @@
 import express from 'express';
 import { createCapsule, updateCapsule, lockCapsule } from '../controllers/capsuleController.js'
-// import { authenticate } from '../controllers/authController.js'; //to authenticate the before post
+import authenticate from '../controllers/authController.js'; //to authenticate the before post
 
 const router = express.Router();
+router.use(authenticate);
 
 // Create a new capsule
 router.post('/', createCapsule);
