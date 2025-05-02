@@ -1,6 +1,7 @@
 // utils/capsule-storage.js
 import DOMPurify from 'dompurify';
 import api from '../services/api';
+import { processContentBeforeSave } from './blob-upload';
 
 /**
  * Creates a new capsule or updates an existing one
@@ -12,7 +13,10 @@ import api from '../services/api';
 export const saveCapsule = async (title, content, id = null) => {
   try {
     const sanitizedTitle = DOMPurify.sanitize(title);
-    const sanitizedContent = sanitizeContent(content);
+    // console.log(content);
+    // Process blob URLs before saving
+    const processedContent = await processContentBeforeSave(id, content);
+    const sanitizedContent = sanitizeContent(processedContent);
     
     if (id) {
       // Update existing capsule
@@ -55,7 +59,10 @@ export const autoSaveCapsule = async (id, title, content) => {
   
   try {
     const sanitizedTitle = DOMPurify.sanitize(title);
-    const sanitizedContent = sanitizeContent(content);
+    // console.log(content);
+    // Process blob URLs before saving
+    const processedContent = await processContentBeforeSave(id, content);
+    const sanitizedContent = sanitizeContent(processedContent);
     
     await api.patch(`/create/capsule/${id}`, {
       title: sanitizedTitle,

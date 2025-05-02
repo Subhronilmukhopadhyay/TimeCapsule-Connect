@@ -17,3 +17,6 @@ Capsule-media-upload.json
 # IDE files
 .vscode/
 .idea/
+
+# uploads
+uploads

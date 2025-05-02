@@ -1,9 +1,11 @@
+import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import authenticate from '../controllers/authController.js';
+import bodyParser from 'body-parser';
 
 const securityMiddleware = (app) => {
   app.use(helmet());
@@ -17,6 +19,14 @@ const securityMiddleware = (app) => {
 
   app.use(cookieParser());
   app.use(csrfProtection);
+
+  // Increase body size limits
+  app.use(bodyParser.json({ limit: '400mb' }));
+  app.use(bodyParser.urlencoded({ limit: '400mb', extended: true }));
+
+  // You might also need:
+  app.use(express.json({ limit: '400mb' }));
+  app.use(express.urlencoded({ limit: '400mb', extended: true }));
 
   app.get('/csrf-token', (req, res) => {
     const csrfToken = req.csrfToken(); 

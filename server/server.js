@@ -5,6 +5,7 @@ import securityMiddleware from './middleware/security.js';
 import authRoutes from './routes/authRoutes.js';
 import CreateCapsuleRoutes from './routes/createCapsuleRoutes.js';
 import ViewCapsuleRoutes from './routes/ViewCapsuleRoutes.js';
+import mediaHandle from './routes/mediaHandle.js';
 
 const app = express();
 
@@ -17,6 +18,7 @@ securityMiddleware(app);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/media-handle',mediaHandle);
 app.use('/create/capsule', CreateCapsuleRoutes);
 app.use('/view/capsule', ViewCapsuleRoutes);
 

@@ -1,7 +1,5 @@
 import Capsule from '../models/Capsule.js';
 import { generateTimeCapsuleId } from '../utils/idGenerator.js';
-import { processCapsuleContent, extractMediaItems } from '../utils/capsuleService.js';
-import { detectMediaChanges } from '../config/googleDrive.js';
 
 /**
  * getting the working capsule
@@ -43,14 +41,14 @@ export const createCapsule = async (req, res) => {
         const { title, content } = req.body;
         // console.log('HERE'+'1'+content);
         // console.log(content);
-        const processedContent = await processCapsuleContent(content);
+        // const processedContent = await processCapsuleContent(content);
         // console.log('process:- '+JSON.stringify(processedContent, null, 2));
         const capsuleId = await generateTimeCapsuleId();
         // console.log(capsuleId);
         const newCapsule = new Capsule({
             _id: capsuleId,
             title: title,
-            content: processedContent,
+            content: content,
         });
         await newCapsule.save();
         res.status(201).json({ id: capsuleId });
@@ -76,21 +74,17 @@ export const updateCapsule = async (req, res) => {
             return res.status(404).json({ error: 'Capsule Not Found' });
         }
 
-        const existingMedia = extractMediaItems(existingCapsule.capsuleContent);
-        const newMedia = extractMediaItems(content);
-        const { hasChanges } = detectMediaChanges(existingMedia, newMedia);
+        // const existingMedia = extractMediaItems(existingCapsule.capsuleContent);
+        // const newMedia = extractMediaItems(content);
+        // const { hasChanges } = detectMediaChanges(existingMedia, newMedia);
 
-        let processedContent = content;
-        if (hasChanges) {
-        console.log('Media changes detected, processing new content');
-        processedContent = await processCapsuleContent(content);
-        }
-
+        // Blob URLs should already be processed on the client side,
+        // so we don't need to detect and process them here
         const updatedCapsule = await Capsule.findByIdAndUpdate(
             req.params.id,
             {
                 title: title,
-                content: processedContent,
+                content: content,
             },
             { new: true }
         );
