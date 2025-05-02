@@ -1,11 +1,12 @@
 // components/create-capsule/sidebar/FontStyle.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useSlate } from 'slate-react';
 import { Editor } from 'slate';
 import styles from './FontStyle.module.css';
 
 const FontStyle = () => {
   const editor = useSlate();
+  const [fontSize, setfontSize] = useState(16);
   
   const handleFontChange = (e) => {
     const fontFamily = e.target.value;
@@ -13,6 +14,7 @@ const FontStyle = () => {
   };
   
   const handleSizeChange = (e) => {
+    setfontSize(e.target.value);
     const fontSize = e.target.value + 'px';
     Editor.addMark(editor, 'fontSize', fontSize);
   };
@@ -35,7 +37,7 @@ const FontStyle = () => {
       <div className={styles.sizeControl}>
         <div className={styles.sizeLabels}>
           <span>Size</span>
-          <span id="font-size-display">16px</span>
+          <span id="font-size-display">{fontSize}px</span>
         </div>
         <input 
           type="range" 

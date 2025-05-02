@@ -77,7 +77,7 @@ export const EditorProvider = ({ children, initialId = null }) => {
         try {
           setIsLoading(true);
           const data = await loadCapsule(initialId);
-          console.log(data);
+          // console.log(data);
           if (data) {
             setCapsuleTitle(data.title || 'Untitled Capsule');
             const withImageUrlsFixed = data.content.map(item => {
