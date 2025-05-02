@@ -1,11 +1,11 @@
 // utils/blob-upload.js
 import api from '../services/api';
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
+const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_MB = 200;
 
 /**
- * Slices a file into 1MB chunks
+ * Slices a file into 50MB chunks
  * @param {File} file - File object to slice
  * @returns {Blob[]} - Array of file chunks
  */
