@@ -4,6 +4,35 @@ import { processCapsuleContent, extractMediaItems } from '../utils/capsuleServic
 import { detectMediaChanges } from '../config/googleDrive.js';
 
 /**
+ * getting the working capsule
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+export const getCapsule = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const capsule = await Capsule.findById(id);
+  
+      if (!capsule) {
+        return res.status(404).json({ error: 'Capsule not found' });
+      }
+  
+      return res.status(200).json({
+        id: capsule._id,
+        title: capsule.title,
+        content: capsule.content,
+        locked: capsule.locked || false,
+        unlockDate: capsule.unlockDate || null,
+        unlockLocation: capsule.unlockLocation || null
+      });
+    } catch (error) {
+      console.error('Error loading capsule:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};  
+
+/**
  * Creates a new time capsule
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object

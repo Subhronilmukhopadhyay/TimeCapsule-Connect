@@ -1,0 +1,57 @@
+/* src/styles/NotFoundPage.module.css */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #c3f7d6 0%, #d8ccff 50%, #c3e4ff 100%);
+    /* light green -> light purple -> future blue */
+    padding: 20px;
+  }
+  
+  .card {
+    background: #ffffffcc; /* semi-transparent white */
+    padding: 50px 40px;
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+  }
+  
+  .title {
+    font-size: 6rem;
+    color: #9333ea; /* futuristic purple */
+    margin-bottom: 10px;
+    font-weight: 800;
+  }
+  
+  .status {
+    font-size: 1.75rem;
+    color: #1f2937;
+    margin-bottom: 12px;
+  }
+  
+  .message {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin-bottom: 30px;
+  }
+  
+  .button {
+    display: inline-block;
+    padding: 14px 28px;
+    background-color: #0ea5e9; /* future blue */
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(14, 165, 233, 0.3);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #0284c7;
+    box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
+  }  

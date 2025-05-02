@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import TimeCapsulePage from './pages/TimeCapsulePage';
+import NotFoundPage from './pages/NotFoundPage';
 import './App.css'
 
 const router = createBrowserRouter([
@@ -34,7 +35,11 @@ const router = createBrowserRouter([
     path: '/create-capsule/:id',
     element: <TimeCapsulePage />,
     loader: authenticatedLoader(),
-  },
+  }, 
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  }
 ]);
 
 export default function App() {

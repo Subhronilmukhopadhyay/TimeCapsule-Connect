@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slate } from 'slate-react';
 
 import { EditorProvider, useEditor } from '../services/EditorContext';
@@ -13,7 +13,16 @@ import LockModal from '../components/Create-capsule/modals/LockModal';
 import styles from '../styles/Create-Capsule.module.css';
 
 const CreateCapsuleContent = () => {
-  const { editor, value, setValue, capsuleTitle, setCapsuleTitle } = useEditor();
+  const { 
+    editor, 
+    value, 
+    setValue, 
+    capsuleTitle, 
+    setCapsuleTitle,
+    isLoading,
+    isSaving
+  } = useEditor();
+  
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
 
@@ -22,6 +31,10 @@ const CreateCapsuleContent = () => {
   
   const openLockModal = () => setShowLockModal(true);
   const closeLockModal = () => setShowLockModal(false);
+
+  if (isLoading && !isSaving) {
+    return <div className={styles.loadingContainer || ''}>Loading capsule...</div>;
+  }
 
   return (
     <Slate 
@@ -34,7 +47,8 @@ const CreateCapsuleContent = () => {
           title={capsuleTitle}
           onTitleChange={(e) => setCapsuleTitle(e.target.value)}
           onPreview={openPreviewModal} 
-          onLock={openLockModal} 
+          onLock={openLockModal}
+          isSaving={isSaving}
         />
         
         <div className={styles.mainContainer}>
@@ -58,8 +72,42 @@ const CreateCapsuleContent = () => {
 };
 
 const CreateCapsule = ({ capsuleId }) => {
+
+  const isNewCapsuleRoute = window.location.pathname === '/create-capsule';
+  if (isNewCapsuleRoute) {
+    localStorage.removeItem('currentCapsuleId');
+  }
+
+  // Identify capsule ID from URL or props
+  const [idFromUrl, setIdFromUrl] = useState(null);
+  
+  useEffect(() => {
+    // Extract ID from URL path, assuming format: /create-capsule/[id]
+    const pathParts = window.location.pathname.split('/');
+    const lastPathPart = pathParts[pathParts.length - 1];
+    
+    // Check if the last path part looks like a capsule ID
+    if (lastPathPart && lastPathPart.includes('-')) {
+      setIdFromUrl(lastPathPart);
+      // Store in localStorage but don't overwrite if there's a direct prop
+      if (!capsuleId) {
+        localStorage.setItem('currentCapsuleId', lastPathPart);
+      }
+    }
+    
+    // Clean up any query parameters
+    const url = new URL(window.location.href);
+    if (url.search) {
+      url.search = '';
+      window.history.replaceState({}, '', url);
+    }
+  }, [capsuleId]);
+
+  // Prioritize direct props over URL path over localStorage
+  const effectiveId = capsuleId || idFromUrl || localStorage.getItem('currentCapsuleId');
+  
   return (
-    <EditorProvider initialId={capsuleId}>
+    <EditorProvider initialId={effectiveId}>
       <CreateCapsuleContent />
     </EditorProvider>
   );

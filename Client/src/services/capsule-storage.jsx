@@ -22,12 +22,14 @@ export const saveCapsule = async (title, content, id = null) => {
       });
       return id;
     } else {
+      // Create new capsule without page reload
       const { data } = await api.post(`/create/capsule`, {
         title: sanitizedTitle,
         content: sanitizedContent,
       });
       
-      window.history.pushState(
+      // Use history.replaceState instead of pushState to avoid adding to browser history stack
+      window.history.replaceState(
         { capsuleId: data.id },
         '',
         `/create-capsule/${data.id}`
@@ -75,7 +77,7 @@ export const autoSaveCapsule = async (id, title, content) => {
  */
 export const loadCapsule = async (id) => {
   try {
-    const { data } = await api.get(`/capsules/${id}`);
+    const { data } = await api.get(`/create/capsule/${id}`);
     return data;
   } catch (error) {
     console.error('Error loading capsule:', error);
