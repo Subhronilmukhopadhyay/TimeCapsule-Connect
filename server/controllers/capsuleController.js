@@ -15,6 +15,11 @@ export const getCapsule = async (req, res) => {
       if (!capsule) {
         return res.status(404).json({ error: 'Capsule not found' });
       }
+
+    //   // Check if the capsule is locked
+    //   if (capsule.locked) {
+    //     return res.status(403).json({ error: 'This capsule is locked and cannot be opened' });
+    //   }
   
       return res.status(200).json({
         id: capsule._id,
@@ -96,6 +101,12 @@ export const updateCapsule = async (req, res) => {
     }
 }
 
+/**
+ * Lock the time capsule
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 export const lockCapsule = async (req, res) => {
     try {
         const { lockSettings } = req.body;
