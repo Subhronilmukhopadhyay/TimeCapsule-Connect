@@ -77,7 +77,7 @@ Before running the project, ensure you have the following installed:
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/yourusername/timecapsule-connect.git
+   git clone https://github.com/Subhronilmukhopadhyay/timecapsule-connect.git
    cd timecapsule-connect
    ```
 
@@ -140,19 +140,6 @@ Here are some planned features and improvements for TimeCapsule Connect:
 - **Mobile App**: A native mobile app for better accessibility and mobile-based capsule creation.
 - **Blockchain Integration**: For immutable storage and future-proofing capsules.
 
----
-
-## 📞 Contact
-
-If you have any questions, issues, or feature requests, feel free to contact the project maintainers.
-
-- **Email**: support@timecapsuleconnect.com
-- **GitHub Issues**: [https://github.com/yourusername/timecapsule-connect/issues](https://github.com/yourusername/timecapsule-connect/issues)
-  
-Follow us on social media for updates:
-
-- **Twitter**: [@TimeCapsuleConnect](https://twitter.com/TimeCapsuleConnect)
-- **LinkedIn**: [TimeCapsule Connect](https://linkedin.com/company/timecapsule-connect)
 
 ---
 
