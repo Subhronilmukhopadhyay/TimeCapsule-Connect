@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective Date: [MM/DD/YYYY]
+Effective Date: [02/05/2025]
 
 At **TimeCapsule Connect**, we respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information.
 
@@ -27,7 +27,7 @@ You have the right to:
 - Request a copy of your data in a portable format.
 - Withdraw your consent for data processing at any time.
 
-To exercise your rights, contact us at [email@example.com].
+To exercise your rights, contact us at [subhro@gmail.com].
 
 ## 5. Data Security
 We use industry-standard security measures to protect your data, including encryption and secure storage practices.
