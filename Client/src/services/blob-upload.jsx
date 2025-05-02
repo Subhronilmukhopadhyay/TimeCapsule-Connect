@@ -2,7 +2,7 @@
 import api from '../services/api';
 
 const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_MB = 200;
+const MAX_MB = 2000;
 
 /**
  * Slices a file into 50MB chunks
