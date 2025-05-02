@@ -3,6 +3,13 @@ import fs from 'fs';
 import path from 'path';
 import { uploadStreamToDrive } from '../config/googleDrive.js';
 
+
+/**
+ * Uploads a complete media file to Google Drive
+ * @param {import('express').Request} req - Express request object containing `file` (from multer)
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>} Sends back `{ url, name }` or an error response
+ */
 export const uploadMedia = async (req, res) => {
   try {
     const file = req.file;
@@ -25,6 +32,13 @@ export const uploadMedia = async (req, res) => {
 
 // Chunked upload: save each chunk to disk
 defaultChunkFolder();
+
+/**
+ * Saves a single uploaded chunk to the temporary storage
+ * @param {import('express').Request} req - Express request object containing chunk `file` and metadata in `body`
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>} Sends `{ success: true }` or an error response
+ */
 export const uploadChunk = async (req, res) => {
   try {
     const { index, uploadId, fileName } = req.body;
@@ -43,7 +57,12 @@ export const uploadChunk = async (req, res) => {
   }
 };
 
-// Finalize upload: merge chunks and upload to Drive
+/**
+ * Finalizes a chunked upload: merges chunks and uploads to Google Drive
+ * @param {import('express').Request} req - Express request object with `uploadId`, `fileName`, `totalChunks`
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<void>} Sends `{ url, name }` or an error response
+ */
 export const completeUpload = async (req, res) => {
   try {
     const { uploadId, fileName, totalChunks } = req.body;
@@ -85,6 +104,9 @@ export const completeUpload = async (req, res) => {
   }
 };
 
+/**
+ * Ensures the uploads/tmp directory exists for storing chunks
+ */
 function defaultChunkFolder() {
   const tmpPath = path.join('uploads', 'tmp');
   if (!fs.existsSync(tmpPath)) fs.mkdirSync(tmpPath, { recursive: true });
