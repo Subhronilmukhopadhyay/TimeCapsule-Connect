@@ -65,6 +65,11 @@ export const EditorProvider = ({ children, initialId = null }) => {
     return capsuleId;
   }, [isModified, capsuleId, capsuleTitle, value, isSaving]);
 
+  function getDriveThumbnailUrl(url) {
+    const match = url.match(/\/d\/([^/]+)/) || url.match(/id=([^&]+)/);
+    return match ? `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1600` : url;
+  }
+
   // Load capsule on initial render if ID is provided
   useEffect(() => {
     const loadInitialCapsule = async () => {
@@ -72,10 +77,16 @@ export const EditorProvider = ({ children, initialId = null }) => {
         try {
           setIsLoading(true);
           const data = await loadCapsule(initialId);
-          
+          console.log(data);
           if (data) {
             setCapsuleTitle(data.title || 'Untitled Capsule');
-            setValue(data.content || INITIAL_EDITOR_VALUE);
+            const withImageUrlsFixed = data.content.map(item => {
+              if (item.type === 'image') {
+                return { ...item, url: getDriveThumbnailUrl(item.url) };
+              }
+              return item;
+            });
+            setValue(withImageUrlsFixed || INITIAL_EDITOR_VALUE);
             setCapsuleId(initialId);
             setLastSaved(new Date());
           }
