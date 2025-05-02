@@ -10,6 +10,7 @@ Capsule-media-upload.json
 
 # Logs
 *.log
+.VSCodeCounter
 
 # OS files
 .DS_Store
