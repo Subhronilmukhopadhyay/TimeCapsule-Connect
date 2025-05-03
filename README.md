@@ -5,22 +5,6 @@
 
 ---
 
-## 📖 Table of Contents
-
-1. [Introduction](#introduction)
-2. [Features](#features)
-3. [Tech Stack](#tech-stack)
-4. [Installation](#installation)
-   - [Prerequisites](#prerequisites)
-   - [Setup Guide](#setup-guide)
-5. [Usage](#usage)
-6. [Contributing](#contributing)
-7. [License](#license)
-8. [Future Enhancements](#future-enhancements)
-9. [Contact](#contact)
-
----
-
 ## ✨ Introduction
 
 TimeCapsule Connect is designed to bring the concept of time capsules into the digital age. By combining modern web technologies with an intuitive user interface, it allows you to create capsules that can be unlocked at a later time, either by yourself or by collaborators. The platform leverages Google Maps integration, real-time collaborative editing, and a hybrid text editor for a rich and seamless experience.
