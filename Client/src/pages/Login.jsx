@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import InputField from "../components/Form/form";
 import { loginHandleSubmit } from "../services/loginHandleSubmit";
+import {useDispatch} from "react-redux"; // Import useDispatch from react-redux
+import {login as authLogin} from "../store/slices/authSlice"; // Import the login action
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -10,9 +12,11 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState(""); 
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const result = await loginHandleSubmit(email, password, navigate);
+    const result = await loginHandleSubmit(email, password, navigate, dispatch, authLogin);
     if (!result.success) {
       setErrorMessage(result.message); 
     }

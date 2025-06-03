@@ -1,7 +1,7 @@
 // loginHandleSubmit.js
 import api from './api';
 
-export const loginHandleSubmit = async (email, password, navigate) => {
+export const loginHandleSubmit = async (email, password, navigate, dispatch, authLogin) => {
   try {
     await api.get('/csrf-token');
 
@@ -11,6 +11,9 @@ export const loginHandleSubmit = async (email, password, navigate) => {
     });
 
     console.log("Login successful:", response.data);
+    if(response.statusText === "OK") {
+      dispatch(authLogin({ userData: response.data.user }));
+    }
     navigate("/dashboard");
 
     return { success: true };

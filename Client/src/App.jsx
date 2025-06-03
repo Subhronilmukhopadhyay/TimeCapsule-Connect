@@ -6,6 +6,9 @@ import Register from './pages/Register';
 import TimeCapsulePage from './pages/TimeCapsulePage';
 import NotFoundPage from './pages/NotFoundPage';
 import './App.css'
+import Dashboard from './components/Dashboard/Dashboard';
+import {Provider} from 'react-redux';
+import store from '../src/store/store.js'
 
 const router = createBrowserRouter([
   { 
@@ -20,6 +23,10 @@ const router = createBrowserRouter([
   { 
     path: '/register', 
     element: <Register /> 
+  },
+  { 
+    path: '/dashboard', 
+    element: <Dashboard /> 
   },
   // {
   //   path: '/dashboard',
@@ -45,7 +52,9 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <>
-      <RouterProvider router={router} />
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
     </>
   )
 }
