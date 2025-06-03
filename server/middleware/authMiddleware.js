@@ -49,7 +49,7 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const query = 'SELECT id, email, password FROM userlogin WHERE email = $1';
+    const query = 'SELECT id, username, email, password FROM userlogin WHERE email = $1';
     const { rows } = await pool.query(query, [email]);
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -65,7 +65,7 @@ export const loginUser = async (req, res) => {
       maxAge: 3600000,
     });
 
-    res.json({ message: 'Login successful' });
+    res.json({ message: 'Login successful', user:user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
