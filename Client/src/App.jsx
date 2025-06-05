@@ -6,7 +6,7 @@ import Register from './pages/Register';
 import TimeCapsulePage from './pages/TimeCapsulePage';
 import NotFoundPage from './pages/NotFoundPage';
 import './App.css'
-import Dashboard from './components/Dashboard/Dashboard';
+import Dashboard from './pages/Dashboard.jsx';
 import {Provider} from 'react-redux';
 import store from '../src/store/store.js'
 
@@ -28,11 +28,11 @@ const router = createBrowserRouter([
     path: '/dashboard', 
     element: <Dashboard /> 
   },
-  // {
-  //   path: '/dashboard',
-  //   element: <Dashboard />,
-  //   loader: authenticatedLoader(),
-  // },
+  {
+    path: '/dashboard',
+    element: <Dashboard />,
+    loader: authenticatedLoader(),
+  },
   {
     path: '/create-capsule',
     element: <TimeCapsulePage />,

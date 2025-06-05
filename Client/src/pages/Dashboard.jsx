@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Header from './Header.jsx';
-import Sidebar from './Sidebar.jsx';
+import Header from '../components/Dashboard/Header.jsx';
+import Sidebar from '../components/Dashboard/Sidebar.jsx';
 
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false); // Central sidebar state
