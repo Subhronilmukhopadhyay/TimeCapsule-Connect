@@ -1,3 +1,4 @@
+// pages/CreateCapsule.jsx
 import React, { useState, useEffect } from 'react';
 import { Slate } from 'slate-react';
 
@@ -10,6 +11,7 @@ import RightSidebar from '../components/Create-capsule/RightSidebar/RightSidebar
 import FloatingToolbar from '../components/Create-capsule/FloatingToolbar/FloatingToolbar';
 import PreviewModal from '../components/Create-capsule/modals/PreviewModal';
 import LockModal from '../components/Create-capsule/modals/LockModal';
+import CollaborationPanel from '../components/Create-capsule/CollaborationPanel/CollaborationPanel';
 import styles from '../styles/Create-Capsule.module.css';
 
 const CreateCapsuleContent = () => {
@@ -20,17 +22,31 @@ const CreateCapsuleContent = () => {
     capsuleTitle, 
     setCapsuleTitle,
     isLoading,
-    isSaving
+    isSaving,
+    isCollaborative,
+    collaborationConnected,
+    collaborators,
+    toggleCollaboration
   } = useEditor();
   
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
+  const [showCollaborationPanel, setShowCollaborationPanel] = useState(false);
 
   const openPreviewModal = () => setShowPreviewModal(true);
   const closePreviewModal = () => setShowPreviewModal(false);
   
   const openLockModal = () => setShowLockModal(true);
   const closeLockModal = () => setShowLockModal(false);
+
+  const toggleCollaborationPanel = () => setShowCollaborationPanel(!showCollaborationPanel);
+
+  const handleCollaborationToggle = (enable) => {
+    toggleCollaboration(enable);
+    if (enable) {
+      setShowCollaborationPanel(true);
+    }
+  };
 
   if (isLoading && !isSaving) {
     return <div className={styles.loadingContainer || ''}>Loading capsule...</div>;
@@ -48,13 +64,25 @@ const CreateCapsuleContent = () => {
           onTitleChange={(e) => setCapsuleTitle(e.target.value)}
           onPreview={openPreviewModal} 
           onLock={openLockModal}
+          onCollaboration={handleCollaborationToggle}
           isSaving={isSaving}
+          isCollaborative={isCollaborative}
+          collaborationConnected={collaborationConnected}
+          collaborators={collaborators}
+          onToggleCollaborationPanel={toggleCollaborationPanel}
         />
         
         <div className={styles.mainContainer}>
           <LeftSidebar />
           <ContentArea />
           <RightSidebar />
+          {showCollaborationPanel && (
+            <CollaborationPanel 
+              collaborators={collaborators}
+              isConnected={collaborationConnected}
+              onClose={() => setShowCollaborationPanel(false)}
+            />
+          )}
         </div>
 
         <FloatingToolbar />
@@ -71,8 +99,11 @@ const CreateCapsuleContent = () => {
   );
 };
 
-const CreateCapsule = ({ capsuleId }) => {
-
+const CreateCapsule = ({ 
+  capsuleId, 
+  collaborative = false, 
+  websocketUrl = 'ws://localhost:1234' 
+}) => {
   const isNewCapsuleRoute = window.location.pathname === '/create-capsule';
   if (isNewCapsuleRoute) {
     localStorage.removeItem('currentCapsuleId');
@@ -107,7 +138,11 @@ const CreateCapsule = ({ capsuleId }) => {
   const effectiveId = capsuleId || idFromUrl || localStorage.getItem('currentCapsuleId');
   
   return (
-    <EditorProvider initialId={effectiveId}>
+    <EditorProvider 
+      initialId={effectiveId}
+      collaborative={collaborative}
+      websocketUrl={websocketUrl}
+    >
       <CreateCapsuleContent />
     </EditorProvider>
   );

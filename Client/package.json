@@ -22,6 +22,7 @@
     "axios": "^1.8.4",
     "dompurify": "^3.2.5",
     "framer-motion": "^12.9.2",
+    "js": "^0.1.0",
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.487.0",

@@ -1,19 +1,22 @@
-/* components/create-capsule/Navbar.module.css */
+/* components/create-capsule/Navbar/Navbar.module.css */
 .navbar {
   width: 100%;
-  padding: 10px 20px;
+  padding: 12px 24px;
   background-color: #ffffff;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-bottom: 1px solid #e1e5e9;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
   z-index: 100;
 }
 
 .navLeft {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
 }
 
 .logo {
@@ -23,11 +26,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .capsuleTitle {
   display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .capsuleName {
@@ -36,6 +41,20 @@
   border-radius: 20px;
   width: 250px;
   font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.capsuleName:focus {
+  background-color: #f8f9fa;
+  border-color: #4a6ef5;
+}
+
+.savingIndicator {
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
 }
 
 .navRight {
@@ -46,14 +65,141 @@
 
 .capsuleActions {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  align-items: center;
+}
+
+.collaborationContainer {
+  position: relative;
+}
+
+.collaborationButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 20px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.collaborationButton:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.collaborationButton.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+}
+
+.collaboratorCount {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 16px;
+  text-align: center;
+}
+
+.connectionStatus {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.connectionStatus.connected {
+  background-color: #10b981;
+}
+
+.connectionStatus.disconnected {
+  background-color: #ef4444;
+}
+
+.collaborationMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  width: 280px;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 1000;
+}
+
+.menuHeader h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.menuDescription {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.menuActions {
+  display: flex;
+  gap: 8px;
+}
+
+.enableButton {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.enableButton:hover {
+  background-color: #2563eb;
+}
+
+.cancelButton {
+  padding: 8px 16px;
+  border: 1px solid #e1e5e9;
+  border-radius: 6px;
+  background-color: white;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .capsuleBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 16px;
   border-radius: 20px;
   border: none;
   font-weight: 500;
+  font-size: 14px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -61,6 +207,12 @@
 .previewBtn {
   background-color: #f0f0f0;
   color: #333;
+  border: 1px solid #e1e5e9;
+}
+
+.previewBtn:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .lockBtn {
