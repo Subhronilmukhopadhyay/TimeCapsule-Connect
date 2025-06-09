@@ -1,5 +1,29 @@
-import Capsule from '../models/Capsule.js';
+import Capsule from '../models/capsule.js';
 import { generateTimeCapsuleId } from '../utils/idGenerator.js';
+
+/**
+ * getting the working capsule collab mode
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+export const getCapsuleCollab = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const capsule = await Capsule.findById(id);
+  
+      if (!capsule) {
+        return res.status(404).json({ error: 'Capsule not found' });
+      }
+  
+      return res.status(200).json({
+        collabMode: capsule.isCollab
+      });
+    } catch (error) {
+      console.error('Error loading capsule:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+};  
 
 /**
  * getting the working capsule
