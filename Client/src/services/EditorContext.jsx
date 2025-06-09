@@ -28,33 +28,51 @@ const INITIAL_EDITOR_VALUE = [
   },
 ];
 
+// Utility to get user status based on activity
+const getUserStatus = (lastActivity, isEditing) => {
+  if (isEditing) return 'Editing now';
+  
+  const now = Date.now();
+  const timeDiff = now - lastActivity;
+  
+  if (timeDiff < 30000) return 'Viewing'; // Active in last 30 seconds
+  if (timeDiff < 300000) return 'Idle'; // Active in last 5 minutes
+  return 'Away';
+};
+
 // Create a React context to share editor state globally
 export const EditorContext = createContext();
 
 /**
  * EditorProvider component that wraps app parts needing access to the editor state
- * @param {Object} props
- * @param {React.ReactNode} props.children - child components that consume the editor context
- * @param {string|null} [props.initialId=null] - Optional initial capsule ID to load an existing capsule
- * @param {boolean} [props.collaborative=false] - Enable collaborative editing mode
- * @param {string} [props.websocketUrl='ws://localhost:1234'] - WebSocket server URL for collaboration
- * @returns {JSX.Element}
  */
 export const EditorProvider = ({ 
   children, 
   initialId = null, 
   collaborative = false,
-  websocketUrl = 'ws://localhost:1234'
+  websocketUrl = 'ws://localhost:1234',
+  currentUser = null // Pass current user from backend
 }) => {
   // Collaboration state
   const [isCollaborative, setIsCollaborative] = useState(collaborative);
   const [collaborationConnected, setCollaborationConnected] = useState(false);
   const [collaborators, setCollaborators] = useState([]);
+  const [activities, setActivities] = useState([]);
+  const [cursors, setCursors] = useState(new Map());
   
   // Y.js refs for collaboration
   const yDocRef = useRef(null);
   const sharedTypeRef = useRef(null);
   const providerRef = useRef(null);
+  const awarenessRef = useRef(null);
+  
+  // Activity tracking
+  const lastActivityRef = useRef(Date.now());
+  const isEditingRef = useRef(false);
+  const activityTimeoutRef = useRef(null);
+  
+  // Store previous collaborators to track changes
+  const previousCollaboratorsRef = useRef([]);
 
   // Create a Slate editor instance enhanced with React, History, and optionally Yjs
   const editor = useMemo(() => {
@@ -92,6 +110,62 @@ export const EditorProvider = ({
   const [isSaving, setIsSaving] = useState(false);
 
   /**
+   * Add activity to the feed
+   */
+  const addActivity = useCallback((user, action, timestamp = Date.now()) => {
+    setActivities(prev => {
+      const newActivity = {
+        id: Date.now() + Math.random(),
+        time: new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        user: user.name,
+        action,
+        timestamp
+      };
+      
+      // Keep only the last 50 activities
+      const updated = [newActivity, ...prev].slice(0, 50);
+      return updated;
+    });
+  }, []);
+
+  /**
+   * Update user activity status
+   */
+  const updateUserActivity = useCallback((isEditing = false) => {
+    lastActivityRef.current = Date.now();
+    isEditingRef.current = isEditing;
+    
+    if (awarenessRef.current && currentUser) {
+      awarenessRef.current.setLocalStateField('user', {
+        ...currentUser,
+        status: getUserStatus(lastActivityRef.current, isEditing),
+        lastActivity: lastActivityRef.current,
+        isEditing,
+        timestamp: Date.now()
+      });
+    }
+    
+    // Clear existing timeout
+    if (activityTimeoutRef.current) {
+      clearTimeout(activityTimeoutRef.current);
+    }
+    
+    // Set timeout to update status to "Idle" after inactivity
+    activityTimeoutRef.current = setTimeout(() => {
+      isEditingRef.current = false;
+      if (awarenessRef.current && currentUser) {
+        awarenessRef.current.setLocalStateField('user', {
+          ...currentUser,
+          status: getUserStatus(lastActivityRef.current, false),
+          lastActivity: lastActivityRef.current,
+          isEditing: false,
+          timestamp: Date.now()
+        });
+      }
+    }, 30000); // 30 seconds of inactivity
+  }, [currentUser]);
+
+  /**
    * Initialize collaboration setup
    */
   const initializeCollaboration = useCallback((roomId) => {
@@ -107,6 +181,7 @@ export const EditorProvider = ({
       yDocRef.current = yDoc;
       sharedTypeRef.current = sharedDoc;
       providerRef.current = yProvider;
+      awarenessRef.current = yProvider.awareness;
 
       // Connection events
       yProvider.on('sync', (isSynced) => {
@@ -132,29 +207,92 @@ export const EditorProvider = ({
 
       // Awareness (cursors, user presence)
       const awareness = yProvider.awareness;
+      
       awareness.on('change', () => {
         const states = Array.from(awareness.getStates().values());
-        setCollaborators(states.filter(state => state.user));
+        const validCollaborators = states.filter(state => state.user);
+        
+        setCollaborators(validCollaborators);
+        
+        // Update cursors for live cursor display
+        const cursorMap = new Map();
+        validCollaborators.forEach((state, index) => {
+          if (state.cursor && state.user) {
+            cursorMap.set(state.user.id || index, {
+              ...state.cursor,
+              user: state.user
+            });
+          }
+        });
+        setCursors(cursorMap);
+        
+        // Track user join/leave activities using ref to avoid dependency issues
+        const currentUserIds = new Set(validCollaborators.map(c => c.user.id));
+        const previousUserIds = new Set(previousCollaboratorsRef.current.map(c => c.user.id));
+        
+        // Check for new users
+        validCollaborators.forEach(collaborator => {
+          if (!previousUserIds.has(collaborator.user.id) && collaborator.user.id !== currentUser?.id) {
+            addActivity(collaborator.user, 'joined the capsule');
+          }
+        });
+        
+        // Check for users who left
+        previousCollaboratorsRef.current.forEach(collaborator => {
+          if (!currentUserIds.has(collaborator.user.id) && collaborator.user.id !== currentUser?.id) {
+            addActivity(collaborator.user, 'left the capsule');
+          }
+        });
+        
+        // Update the ref with current collaborators
+        previousCollaboratorsRef.current = validCollaborators;
       });
 
       // Set current user info
-      awareness.setLocalStateField('user', {
-        name: 'User ' + Math.floor(Math.random() * 1000),
-        color: '#' + Math.floor(Math.random() * 16777215).toString(16),
-        timestamp: Date.now()
-      });
+      if (currentUser) {
+        awareness.setLocalStateField('user', {
+          ...currentUser,
+          status: 'Viewing',
+          lastActivity: Date.now(),
+          isEditing: false,
+          timestamp: Date.now()
+        });
+        
+        addActivity(currentUser, 'joined the capsule');
+      }
 
       console.log('Collaboration initialized for room:', room);
     } catch (err) {
       console.error('Failed to initialize collaboration:', err);
       setError('Failed to start collaborative editing');
     }
-  }, [capsuleId, websocketUrl]);
+  }, [capsuleId, websocketUrl, currentUser, addActivity]); // Removed collaborators dependency
+
+  /**
+   * Update cursor position for live cursors
+   */
+  const updateCursorPosition = useCallback((selection) => {
+    if (awarenessRef.current && currentUser && selection) {
+      awarenessRef.current.setLocalStateField('cursor', {
+        anchor: selection.anchor,
+        focus: selection.focus,
+        timestamp: Date.now()
+      });
+    }
+  }, [currentUser]);
 
   /**
    * Cleanup collaboration
    */
   const cleanupCollaboration = useCallback(() => {
+    if (activityTimeoutRef.current) {
+      clearTimeout(activityTimeoutRef.current);
+    }
+    
+    if (currentUser) {
+      addActivity(currentUser, 'left the capsule');
+    }
+    
     if (providerRef.current) {
       providerRef.current.destroy();
       providerRef.current = null;
@@ -164,9 +302,12 @@ export const EditorProvider = ({
       yDocRef.current = null;
     }
     sharedTypeRef.current = null;
+    awarenessRef.current = null;
+    previousCollaboratorsRef.current = [];
     setCollaborationConnected(false);
     setCollaborators([]);
-  }, []);
+    setCursors(new Map());
+  }, [currentUser, addActivity]);
 
   /**
    * Toggle collaboration mode
@@ -227,6 +368,11 @@ export const EditorProvider = ({
           setLastSaved(new Date());
           localStorage.setItem('currentCapsuleId', newCapsuleId);
           
+          // Add save activity
+          if (currentUser) {
+            addActivity(currentUser, 'saved the capsule');
+          }
+          
           // If switching to collaborative mode and we have a new capsule ID
           if (isCollaborative && !collaborationConnected) {
             initializeCollaboration(newCapsuleId);
@@ -243,7 +389,7 @@ export const EditorProvider = ({
       }
     }
     return capsuleId;
-  }, [isModified, capsuleId, capsuleTitle, value, isSaving, isCollaborative, editor, collaborationConnected, initializeCollaboration]);
+  }, [isModified, capsuleId, capsuleTitle, value, isSaving, isCollaborative, editor, collaborationConnected, initializeCollaboration, currentUser, addActivity]);
 
   /**
    * Extract a Google Drive thumbnail URL from a full Google Drive URL.
@@ -282,6 +428,11 @@ export const EditorProvider = ({
             setCapsuleId(initialId);
             setLastSaved(new Date());
             
+            // Add activity for opening capsule
+            if (currentUser) {
+              addActivity(currentUser, 'opened the capsule');
+            }
+            
             // Initialize collaboration with the loaded capsule ID
             if (isCollaborative) {
               initializeCollaboration(initialId);
@@ -300,7 +451,7 @@ export const EditorProvider = ({
     if (initialId) {
       loadInitialCapsule();
     }
-  }, [initialId, isCollaborative, initializeCollaboration]);
+  }, [initialId, isCollaborative, initializeCollaboration, currentUser, addActivity]);
 
   // Refs for debouncing
   const initialCreationTimeoutRef = useRef(null);
@@ -386,7 +537,10 @@ export const EditorProvider = ({
       setValue(newValue);
     }
     setIsModified(true);
-  }, [isCollaborative]);
+    
+    // Update user activity as editing
+    updateUserActivity(true);
+  }, [isCollaborative, updateUserActivity]);
 
   /**
    * Handler for when the capsule title changes.
@@ -394,7 +548,23 @@ export const EditorProvider = ({
   const handleTitleChange = useCallback((newTitle) => {
     setCapsuleTitle(newTitle);
     setIsModified(true);
-  }, []);
+    
+    // Add activity for title change
+    if (currentUser) {
+      addActivity(currentUser, 'changed the title');
+    }
+    
+    // Update user activity
+    updateUserActivity(true);
+  }, [currentUser, addActivity, updateUserActivity]);
+
+  /**
+   * Handler for selection change (for live cursors)
+   */
+  const handleSelectionChange = useCallback((selection) => {
+    updateCursorPosition(selection);
+    updateUserActivity(false); // Just viewing/navigating
+  }, [updateCursorPosition, updateUserActivity]);
 
   /**
    * Manually force a save of the capsule.
@@ -427,7 +597,13 @@ export const EditorProvider = ({
     isCollaborative,
     collaborationConnected,
     collaborators,
+    activities,
+    cursors,
     toggleCollaboration,
+    updateUserActivity,
+    addActivity,
+    handleSelectionChange,
+    currentUser,
   };
 
   return (

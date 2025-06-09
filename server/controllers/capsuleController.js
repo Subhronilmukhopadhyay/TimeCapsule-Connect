@@ -1,5 +1,8 @@
 import Capsule from '../models/capsule.js';
 import { generateTimeCapsuleId } from '../utils/idGenerator.js';
+import jwt from 'jsonwebtoken';
+import { pool } from '../config/db.js';
+import 'dotenv/config';
 
 /**
  * getting the working capsule collab mode
@@ -151,3 +154,15 @@ export const lockCapsule = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+export const getCollaborator = async (req, res) => {
+  try {
+    const userId = req.user.id; // from authenticate middleware
+    const result = await pool.query('SELECT name FROM userlogin WHERE id = $1', [userId]);
+    if (result.rows.length === 0) return res.status(404).json({ message: 'User not found' });
+    res.json({ name: result.rows[0].name });
+  } catch (err) {
+    console.error('Error fetching collaborator name:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

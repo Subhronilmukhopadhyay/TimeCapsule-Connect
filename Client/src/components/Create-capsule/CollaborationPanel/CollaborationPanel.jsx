@@ -48,14 +48,14 @@ const CollaborationPanel = ({ collaborators, isConnected, onClose }) => {
                   className={styles.avatar} 
                   style={{ backgroundColor: collaborator.color }}
                 >
-                  {collaborator.name.charAt(0).toUpperCase()}
+                  {collaborator.user.name.charAt(0).toUpperCase()}
                 </div>
                 
                 {/* Name and timestamp */}
                 <div className={styles.info}>
-                  <span className={styles.name}>{collaborator.name}</span>
+                  <span className={styles.name}>{collaborator.user.name}</span>
                   <span className={styles.timestamp}>
-                    {new Date(collaborator.timestamp).toLocaleTimeString()}
+                    {new Date(collaborator.user.timestamp).toLocaleTimeString()}
                   </span>
                 </div>
               </li>

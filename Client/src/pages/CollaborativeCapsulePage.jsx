@@ -30,7 +30,6 @@ const CollaborativeCapsulePage = () => {
       capsuleId={id}
       collaborative={isCollabMode}
       websocketUrl="ws://localhost:1234"
-      onSetCollaborative={setIsCollabMode}
     />
   );
 };

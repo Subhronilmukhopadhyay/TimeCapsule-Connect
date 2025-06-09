@@ -10,3 +10,13 @@ export const fetchCollabMode = async (id) => {
     throw error;
   }
 };
+
+export const getCurrentUser = async () => {
+  try {
+    const response = await api.get('/create/capsule/collabName'); // endpoint that returns { name: "..." }
+    return response.data; // { name: "John Doe" }
+  } catch (error) {
+    console.error('Error fetching current user:', error);
+    throw error;
+  }
+};

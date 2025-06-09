@@ -13,7 +13,7 @@ import FloatingToolbar from '../components/Create-capsule/FloatingToolbar/Floati
 import PreviewModal from '../components/Create-capsule/modals/PreviewModal';
 import LockModal from '../components/Create-capsule/modals/LockModal';
 import CollaborationPanel from '../components/Create-capsule/CollaborationPanel/CollaborationPanel';
-
+import { getCurrentUser } from '../services/collabMode';
 import styles from '../styles/Create-Capsule.module.css';
 
 /**
@@ -148,6 +148,7 @@ const CreateCapsule = ({
   }
 
   const [idFromUrl, setIdFromUrl] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   /**
    * Effect to extract capsule ID from the URL path and set it locally.
@@ -177,6 +178,22 @@ const CreateCapsule = ({
     }
   }, [capsuleId]);
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await getCurrentUser(); // Expects { name: '...' }
+        setCurrentUser({
+          id: 'user-' + Date.now(), // Optional: generate temp id, or fetch actual user ID if returned
+          name: data.name,
+        });
+      } catch (err) {
+        console.error('Error fetching current user:', err);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   // Determine effective capsule ID to use in the session
   const effectiveId = capsuleId || idFromUrl || localStorage.getItem('currentCapsuleId');
 
@@ -185,6 +202,7 @@ const CreateCapsule = ({
       initialId={effectiveId}
       collaborative={collaborative}
       websocketUrl={websocketUrl}
+      currentUser={currentUser}
     >
       <CreateCapsuleContent />
     </EditorProvider>

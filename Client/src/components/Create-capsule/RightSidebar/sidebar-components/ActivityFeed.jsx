@@ -1,5 +1,6 @@
 // components/create-capsule/sidebar/Activity.jsx
 import React from 'react';
+import { useEditor } from '../../../../services/EditorContext';
 import styles from './Activity.module.css';
 
 const ActivityItem = ({ time, user, action }) => (
@@ -12,23 +13,24 @@ const ActivityItem = ({ time, user, action }) => (
 );
 
 const Activity = () => {
-  const activities = [
-    { time: '10:32 AM', user: 'John Doe', action: 'added an image' },
-    { time: '10:15 AM', user: 'You', action: 'started this capsule' },
-  ];
+  const { activities } = useEditor();
 
   return (
     <div className={styles.activitySection}>
       <h3>Activity</h3>
       <div className={styles.activityTimeline}>
-        {activities.map((activity, index) => (
-          <ActivityItem 
-            key={index}
-            time={activity.time}
-            user={activity.user}
-            action={activity.action}
-          />
-        ))}
+        {activities.length === 0 ? (
+          <div className={styles.noActivity}>No recent activity</div>
+        ) : (
+          activities.map((activity) => (
+            <ActivityItem 
+              key={activity.id}
+              time={activity.time}
+              user={activity.user}
+              action={activity.action}
+            />
+          ))
+        )}
       </div>
     </div>
   );
