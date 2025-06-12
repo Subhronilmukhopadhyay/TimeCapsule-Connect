@@ -66,6 +66,10 @@ const capsuleSchema = new Schema ({
         type: Date,
         default: Date.now,
     },
+    isCollab: {
+        type: Boolean,
+        default: false,
+    },
     collaborators: [{
         type: Schema.Types.ObjectId,
         ref: 'User',

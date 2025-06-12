@@ -1,0 +1,194 @@
+/* components/Create-capsule/CollaborationPanel/CollaborationPanel.module.css */
+
+.collaborationPanel {
+  position: fixed;
+  right: 20px;
+  top: 80px;
+  width: 300px;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.closeButton:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.status {
+  padding: 16px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.connected .dot {
+  background-color: #10b981;
+}
+
+.disconnected .dot {
+  background-color: #ef4444;
+}
+
+.connected {
+  color: #10b981;
+}
+
+.disconnected {
+  color: #ef4444;
+}
+
+.collaboratorsList {
+  padding: 16px;
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.collaboratorsList h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.noCollaborators {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+  font-style: italic;
+}
+
+.collaborators {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.collaborator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a1a;
+}
+
+.timestamp {
+  font-size: 12px;
+  color: #666;
+}
+
+.shareSection {
+  padding: 16px;
+}
+
+.shareSection h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.shareUrl {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.urlInput {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #f8f9fa;
+}
+
+.copyButton {
+  padding: 8px 12px;
+  border: 1px solid #e1e5e9;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.copyButton:hover {
+  background-color: #f3f4f6;
+}
+
+.shareNote {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}

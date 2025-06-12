@@ -1,8 +1,11 @@
 // components/create-capsule/sidebar/Collaborators.jsx
 import React from 'react';
+import { useEditor } from '../../../../services/EditorContext';
 import styles from './Collaborators.module.css';
 
-const CollaboratorItem = ({ initials, name, status, color }) => {
+const CollaboratorItem = ({ initials, name, status, color, isOwner, isCurrentUser }) => {
+  const displayName = isCurrentUser ? `${name} (You)` : isOwner ? `${name} (Owner)` : name;
+  
   return (
     <div className={styles.collaborator}>
       <div 
@@ -12,20 +15,19 @@ const CollaboratorItem = ({ initials, name, status, color }) => {
         {initials}
       </div>
       <div className={styles.collaboratorInfo}>
-        <div className={styles.collaboratorName}>{name}</div>
-        <div className={styles.collaboratorStatus}>{status}</div>
+        <div className={styles.collaboratorName}>{displayName}</div>
+        <div className={`${styles.collaboratorStatus} ${styles[status.toLowerCase().replace(' ', '')]}`}>
+          {status}
+        </div>
       </div>
+      <div className={`${styles.statusIndicator} ${styles[status.toLowerCase().replace(' ', '')]}`}></div>
     </div>
   );
 };
 
 const Collaborators = () => {
-  const collaborators = [
-    { initials: 'YS', name: 'You (Owner)', status: 'Editing now' },
-    { initials: 'JD', name: 'John Doe', status: 'Viewing', color: '#FF5733' },
-    { initials: 'EM', name: 'Emily Morgan', status: 'Idle', color: '#33A1FF' },
-  ];
-
+  const { collaborators, currentUser } = useEditor();
+  
   return (
     <div className={styles.collaboratorsSection}>
       <div className={styles.collaboratorsTitle}>
@@ -39,13 +41,15 @@ const Collaborators = () => {
       </div>
       
       <div className={styles.collaboratorsList}>
-        {collaborators.map((collaborator, index) => (
+        {collaborators.map((collaborator) => (
           <CollaboratorItem 
-            key={index}
-            initials={collaborator.initials}
-            name={collaborator.name}
-            status={collaborator.status}
-            color={collaborator.color}
+            key={collaborator.user.id}
+            initials={collaborator.user.initials}
+            name={collaborator.user.name}
+            status={collaborator.user.status}
+            color={collaborator.user.color}
+            isOwner={collaborator.user.role === 'owner'}
+            isCurrentUser={collaborator.user.id === currentUser?.id}
           />
         ))}
       </div>
