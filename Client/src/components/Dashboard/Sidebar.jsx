@@ -1,26 +1,33 @@
-import {useDispatch} from 'react-redux';
-import {logout as authLogout} from '../../store/slices/authSlice';
-import { useNavigate } from 'react-router-dom';
+// src/components/Dashboard/Sidebar.jsx
+import { useDispatch } from 'react-redux';
+import { logout as authLogout } from '../../store/slices/authSlice';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const handleLogout = () => {
-    dispatch(authLogout()); // Dispatch the logout action
-    setIsOpen(false); // Close the sidebar on logout
-    navigate('/'); // Redirect to login page
+    dispatch(authLogout());
+    setIsOpen(false);
+    navigate('/');
   };
 
   const menuItems = [
-    { name: 'Dashboard', icon: '🏠' },
-    { name: 'My Capsules', icon: '📊' },
-    { name: 'Explore', icon: '📋' },
-    { name: 'Settings', icon: '⚙️' },
+    { name: 'Dashboard', icon: '📊', path: '/dashboard' },
+    { name: 'My Capsules', icon: '🗂️', path: '/dashboard/my-capsules' },
+    // { name: 'Time-Locked', icon: '⏳', path: '/dashboard/time-locked' },
+    // { name: 'Location-Locked', icon: '📍', path: '/dashboard/location-locked' },
+    { name: 'Explore', icon: '🧭', path: '/dashboard/explore' },
+    { name: 'Shared with me', icon: '👥', path: '/dashboard/shared-with-me' },
+    { name: 'Messages', icon: '💬', path: '/dashboard/messages' },
+    // { name: 'Notifications', icon: '🔔', path: '/dashboard/notifications' },
+    // { name: 'Settings', icon: '⚙️', path: '/dashboard/settings' },
+
   ];
 
   return (
     <>
-      {/* Hamburger Button */}
       <button
         className="p-4 fixed top-0 left-0 z-50 text-white bg-gray-800 rounded-r-sm shadow-sm"
         onClick={() => setIsOpen(!isOpen)}
@@ -28,23 +35,22 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
         {isOpen ? '✕' : '☰'}
       </button>
 
-      {/* Sidebar */}
       <div
         className={`h-screen bg-gray-800 text-white fixed top-0 left-0 transition-all duration-300 ease-in-out z-40 ${
           isOpen ? 'w-64' : 'w-16'
-        }`
-      }
+        }`}
       >
         <div className="p-4 pt-16">
           <h1 className={`text-2xl font-bold ${isOpen ? 'block' : 'hidden'}`}>
             TimeCapsule
           </h1>
         </div>
+
         <nav className="mt-4">
           {menuItems.map((item, index) => (
-            <a
+            <Link
               key={index}
-              href="#"
+              to={item.path}
               className="flex items-center p-4 hover:bg-gray-700"
               onClick={() => setIsOpen(false)}
             >
@@ -52,22 +58,21 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               <span className={`${isOpen ? 'block' : 'hidden'}`}>
                 {item.name}
               </span>
-            </a>
+            </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-full p-4">
-          <a
-            href="#"
-            className="flex items-center p-2 hover:bg-gray-700 rounded-lg"
-            onClick={() => setIsOpen(false)}
+
+        <div className="absolute bottom-0 w-full p-3">
+          <button
+            className="flex items-center p-2 hover:bg-gray-700 rounded-lg w-full"
+            onClick={handleLogout}
           >
-            <span className="mr-2"onClick={handleLogout}>🔒</span>
-            <span className={`${isOpen ? 'block' : 'hidden'}`} onClick={handleLogout}>Logout</span>
-          </a>
+            <span className="mr-2">🔒</span>
+            <span className={`${isOpen ? 'block' : 'hidden'}`}>Logout</span>
+          </button>
         </div>
       </div>
 
-      {/* Overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black opacity-50 z-30 md:hidden"

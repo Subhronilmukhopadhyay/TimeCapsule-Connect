@@ -10,7 +10,11 @@ import './App.css'
 import Dashboard from './pages/Dashboard.jsx';
 import {Provider} from 'react-redux';
 import store from '../src/store/store.js'
-
+import Settings from '../src/components/Dashboard/Settings.jsx'
+import ContentArea from '../src/components/Dashboard/ContentArea.jsx'
+import Explore from '../src/components/Dashboard/Explore.jsx'
+import MyCapsules from './components/Dashboard/MyCapsules.jsx';
+import SharedWithMe from './components/Dashboard/SharedWithMe.jsx'
 const router = createBrowserRouter([
   { 
     path: '/', 
@@ -27,13 +31,36 @@ const router = createBrowserRouter([
   },
   { 
     path: '/dashboard', 
-    element: <Dashboard /> 
+    element: <Dashboard /> ,
+    // loader: authenticatedLoader(),
+    children:[
+      {
+        index:true,
+        element:<ContentArea/>
+      },
+      {
+        path:'settings',
+        element:<Settings/>
+      },
+      {
+        path:'explore',
+        element:<Explore/>
+      },
+      {
+        path:'my-capsules',
+        element:<MyCapsules/>
+      },
+      {
+        path:'shared-with-me',
+        element:<SharedWithMe/>
+      }
+    ],
   },
-  {
-    path: '/dashboard',
-    element: <Dashboard />,
-    loader: authenticatedLoader(),
-  },
+  // {
+  //   path: '/dashboard',
+  //   element: <Dashboard />,
+  //   loader: authenticatedLoader(),
+  // },
   {
     path: '/create-capsule',
     element: <TimeCapsulePage />,

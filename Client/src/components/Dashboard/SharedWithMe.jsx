@@ -1,0 +1,65 @@
+import { useEffect, useState } from 'react';
+import CapsuleCard from './CapsuleCard.jsx';
+
+const SharedCapsules = () => {
+  const [capsules, setCapsules] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchSharedCapsules = async () => {
+      try {
+        const res = await fetch('/api/shared-capsules'); // Adjust based on backend
+        if (!res.ok) throw new Error('Failed to fetch shared capsules');
+        const data = await res.json();
+        setCapsules(data);
+      } catch (err) {
+        setError(err.message || 'Something went wrong');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSharedCapsules();
+  }, []);
+
+  const locked = capsules.filter((c) => c.locked);
+  const unlocked = capsules.filter((c) => !c.locked);
+
+  return (
+    <div className="p-4">
+      <h2 className="text-2xl font-bold mb-4">Shared with Me</h2>
+
+      {loading && <p className="text-gray-500">Loading...</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
+
+      {!loading && !error && (
+        <>
+          <section className="mb-6">
+            <h3 className="text-xl font-semibold mb-2">🔒 Locked</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {locked.length ? (
+                locked.map((capsule, idx) => <CapsuleCard key={idx} capsule={capsule} />)
+              ) : (
+                <p className="text-sm text-gray-400">No locked shared capsules</p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-xl font-semibold mb-2">🔓 Unlocked</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {unlocked.length ? (
+                unlocked.map((capsule, idx) => <CapsuleCard key={idx} capsule={capsule} />)
+              ) : (
+                <p className="text-sm text-gray-400">No unlocked shared capsules</p>
+              )}
+            </div>
+          </section>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default SharedCapsules;
