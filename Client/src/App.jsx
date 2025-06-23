@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { authenticatedLoader } from './services/authenticatedLoader';
+import { authenticatedLoader, redirectIfAuthenticatedLoader } from './services/authenticatedLoader';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -18,16 +18,19 @@ import SharedWithMe from './components/Dashboard/SharedWithMe.jsx'
 const router = createBrowserRouter([
   { 
     path: '/', 
+    loader: redirectIfAuthenticatedLoader(),
     element: <Home />,
     // errorElement: <ErrorPage />, 
   },
   { 
     path: '/login', 
-    element: <Login /> 
+    element: <Login />,
+    loader: redirectIfAuthenticatedLoader(),
   },
   { 
     path: '/register', 
-    element: <Register /> 
+    element: <Register />,
+    loader: redirectIfAuthenticatedLoader(),
   },
   { 
     path: '/dashboard', 

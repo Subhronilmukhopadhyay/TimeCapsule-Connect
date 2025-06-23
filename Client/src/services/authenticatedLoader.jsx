@@ -13,3 +13,16 @@ export function authenticatedLoader(loader) {
     }
   };
 }
+
+export function redirectIfAuthenticatedLoader(loader) {
+  return async (args) => {
+    try {
+      await api.get('/me');
+      // Already logged in — redirect to dashboard
+      throw redirect('/dashboard'); 
+    } catch {
+      // Not logged in — continue to login/register
+      return loader ? loader(args) : null;
+    }
+  };
+}

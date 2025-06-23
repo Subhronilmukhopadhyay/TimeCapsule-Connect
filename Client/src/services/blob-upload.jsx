@@ -1,5 +1,5 @@
 // utils/blob-upload.js
-import api from '../services/api';
+import api from './api';
 
 const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_MB = 2000;

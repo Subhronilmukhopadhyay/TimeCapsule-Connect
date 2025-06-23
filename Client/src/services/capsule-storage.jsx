@@ -1,6 +1,6 @@
 // utils/capsule-storage.js
 import DOMPurify from 'dompurify';
-import api from '../services/api';
+import api from './api';
 import { processContentBeforeSave } from './blob-upload';
 
 /**
