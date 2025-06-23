@@ -81,6 +81,7 @@ export const createCapsule = async (req, res) => {
             _id: capsuleId,
             title: title,
             content: content,
+            owner: req.user.id,
         });
         await newCapsule.save();
         res.status(201).json({ id: capsuleId });
@@ -164,5 +165,65 @@ export const getCollaborator = async (req, res) => {
   } catch (err) {
     console.error('Error fetching collaborator name:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+/**
+ * Get all the capsules
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+export const userCapsules = async (req, res) => {
+  try {
+    const { collab } = req.query;
+
+    const filter = { owner: req.user.id };
+
+    if (collab === 'true') {
+      filter.isCollab = true;
+    }
+
+    const capsules = await Capsule.find(filter);
+
+    return res.status(200).json(
+      capsules.map(capsule => ({
+        id: capsule._id,
+        title: capsule.title,
+        content: capsule.content,
+        locked: capsule.locked,
+        unlockDate: capsule.unlockDate,
+        unlockLocation: capsule.unlockLocation,
+      }))
+    );
+  } catch (error) {
+    console.error('Error fetching user capsules:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
+ * Get all the capsules within 5 km radius of the user coordinates
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+export const capsules = async (req, res) => {
+  try {
+    const capsules = await Capsule.find();
+
+    return res.status(200).json(
+      capsules.map(capsule => ({
+        id: capsule._id,
+        title: capsule.title,
+        content: capsule.content,
+        locked: capsule.locked,
+        unlockDate: capsule.unlockDate,
+        unlockLocation: capsule.unlockLocation
+      }))
+    );
+  } catch (error) {
+    console.error('Error fetching user capsules:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

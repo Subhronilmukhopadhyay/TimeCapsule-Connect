@@ -121,7 +121,12 @@ const LockModal = ({ onClose }) => {
       const lockSettings = {
         lockDate,
         lockLocation: lockLocation || (marker ? `${marker.lat.toFixed(6)}, ${marker.lng.toFixed(6)}` : ''),
-        coordinates: marker,
+        coordinates: marker
+          ? {
+              type: 'Point',
+              coordinates: [marker.lng, marker.lat] // GeoJSON requires [lng, lat]
+            }
+          : undefined,
         createdAt: new Date().toISOString(),
       };
       

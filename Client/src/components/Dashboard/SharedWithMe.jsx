@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import api from '../../services/api'
 import CapsuleCard from './CapsuleCard.jsx';
 
 const SharedCapsules = () => {
@@ -9,9 +10,8 @@ const SharedCapsules = () => {
   useEffect(() => {
     const fetchSharedCapsules = async () => {
       try {
-        const res = await fetch('/api/shared-capsules'); // Adjust based on backend
-        if (!res.ok) throw new Error('Failed to fetch shared capsules');
-        const data = await res.json();
+        const res = await api.get('/view/capsule?collab=true');
+        const data = res.data;
         setCapsules(data);
       } catch (err) {
         setError(err.message || 'Something went wrong');

@@ -28,7 +28,7 @@ const CollaborativeCapsulePage = () => {
   return (
     <CreateCapsule
       capsuleId={id}
-      collaborative={true}
+      collaborative={false}
       websocketUrl="ws://localhost:1234"
     />
   );

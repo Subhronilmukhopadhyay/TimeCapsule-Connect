@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import CapsuleCard from './CapsuleCard.jsx'
+import api from '../../services/api'
+import CapsuleCard from './CapsuleCard'
 
 const MyCapsules = () => {
   const [capsules, setCapsules] = useState([]);
@@ -9,9 +10,8 @@ const MyCapsules = () => {
   useEffect(() => {
     const fetchUserCapsules = async () => {
       try {
-        const res = await fetch('/api/my-capsules'); // Replace with actual endpoint
-        if (!res.ok) throw new Error('Failed to fetch capsules');
-        const data = await res.json();
+        const res = await api.get('/view/capsule');
+        const data = res.data;
         setCapsules(data);
       } catch (err) {
         setError(err.message || 'Something went wrong');

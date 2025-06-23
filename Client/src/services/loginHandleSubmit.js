@@ -12,6 +12,7 @@ export const loginHandleSubmit = async (email, password, navigate, dispatch, aut
 
     console.log("Login successful:", response.data);
     if(response.statusText === "OK") {
+      localStorage.setItem('myAppState', JSON.stringify(response.data.user));
       dispatch(authLogin({ userData: response.data.user }));
     }
     navigate("/dashboard");

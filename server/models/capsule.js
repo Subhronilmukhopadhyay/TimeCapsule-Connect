@@ -50,17 +50,24 @@ const capsuleSchema = new Schema ({
     lockLocation: {
         type: String,
     },
+    // 👇 GeoJSON-compatible coordinates for geospatial queries
     coordinates: {
-        lat: {
-            type: Number,
-            min: -90,
-            max: 90,
+        type: {
+            type: String,
+            enum: ['Point'],
+            // default: 'Point'
         },
-        lng: {
-            type: Number,
-            min: -180,
-            max: 180,
-         },
+        coordinates: {
+            type: [Number], // [lng, lat]
+            validate: {
+                validator: function (val) {
+                    return val.length === 2 &&
+                        val[0] >= -180 && val[0] <= 180 &&  // lng
+                        val[1] >= -90 && val[1] <= 90;     // lat
+                },
+                message: props => `${props.value} is not a valid [lng, lat] coordinate pair`
+            }
+        }
     },
     createdAt: {
         type: Date,
@@ -74,7 +81,15 @@ const capsuleSchema = new Schema ({
         type: Schema.Types.ObjectId,
         ref: 'User',
     }],
+    owner: {
+        type: Number,
+        required: true,
+        index: true
+    },
 })
+
+// 👇 Geospatial index for coordinates
+capsuleSchema.index({ coordinates: '2dsphere' }, { sparse: true }); 
 
 const Capsule = model('Capsule', capsuleSchema);
 export default Capsule;
