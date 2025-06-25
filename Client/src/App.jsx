@@ -35,7 +35,7 @@ const router = createBrowserRouter([
   { 
     path: '/dashboard', 
     element: <Dashboard /> ,
-    // loader: authenticatedLoader(),
+    loader: authenticatedLoader(),
     children:[
       {
         index:true,
