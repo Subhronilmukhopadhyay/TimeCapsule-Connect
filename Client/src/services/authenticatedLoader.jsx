@@ -14,15 +14,13 @@ export function authenticatedLoader(loader) {
   };
 }
 
-export function redirectIfAuthenticatedLoader(loader) {
-  return async (args) => {
+export function redirectIfAuthenticatedLoader() {
+  return async () => {
     try {
-      await api.get('/me');
-      // Already logged in — redirect to dashboard
-      throw redirect('/dashboard'); 
-    } catch {
-      // Not logged in — continue to login/register
-      return loader ? loader(args) : null;
+      await api.get('/me'); // If authenticated
+      return redirect('/dashboard');
+    } catch (err) {
+      return null; // Not authenticated, proceed to route
     }
   };
 }
