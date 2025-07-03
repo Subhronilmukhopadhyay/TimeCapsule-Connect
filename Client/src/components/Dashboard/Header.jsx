@@ -203,7 +203,7 @@ const Header = ({ isOpen }) => {
   const dropdownRef = useRef(null);
   const bellRef = useRef(null);
 
-  const authData = useSelector((state) => state.auth.userData?.username || 'Guest');
+  const authData = useSelector((state) => state.auth.userData?.username);
   const dispatch = useDispatch();
 
   const handleLogout = () => {

@@ -25,6 +25,8 @@ const MyCapsules = () => {
 
   const locked = capsules.filter((c) => c.locked);
   const unlocked = capsules.filter((c) => !c.locked);
+  const inMaking = capsules.filter((c) => !c.locked && c.inMaking); // or some other property
+
 
   return (
     <div className="p-4">
@@ -35,6 +37,7 @@ const MyCapsules = () => {
 
       {!loading && !error && (
         <>
+
           <section className="mb-6">
             <h3 className="text-xl font-semibold mb-2">🔒 Locked</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -42,6 +45,17 @@ const MyCapsules = () => {
                 locked.map((capsule, idx) => <CapsuleCard key={idx} capsule={capsule} />)
               ) : (
                 <p className="text-sm text-gray-400">No locked capsules</p>
+              )}
+            </div>
+          </section>
+
+          <section className="mb-6">
+            <h3 className="text-xl font-semibold mb-2">🛠️ In Making</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {inMaking.length ? (
+                inMaking.map((capsule, idx) => <CapsuleCard key={idx} capsule={capsule} />)
+              ) : (
+                <p className="text-sm text-gray-400">No capsules in making</p>
               )}
             </div>
           </section>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import api from '../../services/api'
 
 const ContentArea = () => {
   const [data, setData] = useState([]);       // Stores fetched data
@@ -11,6 +12,9 @@ const ContentArea = () => {
         // const res = await fetch('/api/data'); // Replace with your real endpoint
         // if (!res.ok) throw new Error('Failed to fetch');
         // const json = await res.json();
+        const res = await api.get(`/view/capsule`);
+        // const data = await res.json();
+        console.log(res);
         setData(['Fetched Data']);
       } catch (err) {
         setError(err.message || 'Unknown error');
