@@ -52,6 +52,7 @@ export const getCapsule = async (req, res) => {
         id: capsule._id,
         title: capsule.title,
         content: capsule.content,
+        inMaking: capsule.inMaking,
         locked: capsule.locked || false,
         unlockDate: capsule.unlockDate || null,
         unlockLocation: capsule.unlockLocation || null
@@ -141,6 +142,7 @@ export const lockCapsule = async (req, res) => {
         const lockedCapsule = await Capsule.findByIdAndUpdate(
             req.params.id,
             {
+                inMaking: false,
                 locked: true,
                 ...lockSettings,
             },
@@ -191,6 +193,7 @@ export const userCapsules = async (req, res) => {
         id: capsule._id,
         title: capsule.title,
         content: capsule.content,
+        inMaking: capsule.inMaking,
         locked: capsule.locked,
         unlockDate: capsule.unlockDate,
         unlockLocation: capsule.unlockLocation,
@@ -217,6 +220,7 @@ export const capsules = async (req, res) => {
         id: capsule._id,
         title: capsule.title,
         content: capsule.content,
+        inMaking: capsule.inMaking,
         locked: capsule.locked,
         unlockDate: capsule.unlockDate,
         unlockLocation: capsule.unlockLocation

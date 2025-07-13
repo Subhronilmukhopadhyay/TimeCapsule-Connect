@@ -40,6 +40,10 @@ const capsuleSchema = new Schema ({
         type: Date,
         default: Date.now,
     },
+    inMaking: {
+        type: Boolean,
+        default: true,
+    },
     locked: {
         type: Boolean,
         default: false,
