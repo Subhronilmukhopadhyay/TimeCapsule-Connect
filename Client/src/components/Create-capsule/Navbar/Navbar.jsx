@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import api from '../../../services/api'
-import styles from './Navbar.module.css';
+import styles from './NavBar.module.css';
 
 const NavBar = ({
   capsuleId, 
