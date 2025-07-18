@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ProfileSettings from './Settings/ProfileSettings'
 // import PrivacySettings from './settings/PrivacySettings';
-import NotificationSettings from './settings/NotificationSettings';
+import NotificationSettings from './Settings/NotificationSettings';
 import DeleteAccount from './Settings/DeleteAccount';
 
 const Settings = () => {
