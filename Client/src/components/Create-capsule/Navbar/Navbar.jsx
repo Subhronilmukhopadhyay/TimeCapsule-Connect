@@ -1,9 +1,11 @@
 // components/create-capsule/Navbar/NavBar.jsx
 import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
+import api from '../../../services/api'
 import styles from './Navbar.module.css';
 
-const Navbar = ({ 
+const Navbar = ({
+  capsuleId, 
   title, 
   onTitleChange, 
   onPreview, 
@@ -25,9 +27,37 @@ const Navbar = ({
     }
   };
 
-  const enableCollaboration = () => {
-    onCollaboration(true);
-    setShowCollaborationMenu(false);
+  const enableCollaboration = async () => {
+    if (!capsuleId) return;
+
+    try {
+      const res = await api.post(`/create/capsule/capsules/${capsuleId}/collab`, {
+        isCollab: true,
+      });
+      if (res.status === 200) {
+        onCollaboration(true);  
+        setShowCollaborationMenu(false);
+      }
+    } catch (err) {
+      console.error("Failed to enable collaboration:", err);
+      alert("Could not enable collaboration.");
+    }
+  };
+
+  const disableCollaboration = async () => {
+    if (!capsuleId) return;
+
+    try {
+      const res = await api.post(`/create/capsules/capsules/${capsuleId}/collab`, {
+        isCollab: false,
+      });
+      if (res.status === 200) {
+        onCollaboration(false);  // update parent
+      }
+    } catch (err) {
+      console.error("Failed to disable collaboration:", err);
+      alert("Could not disable collaboration.");
+    }
   };
 
   return (
@@ -91,8 +121,10 @@ const Navbar = ({
                 </p>
                 <div className={styles.menuActions}>
                   <button 
-                    className={styles.enableButton}
+                    className={`${styles.enableButton} ${!capsuleId ? styles.disabledButton : ''}`}
                     onClick={enableCollaboration}
+                    disabled={!capsuleId}
+                    title={!capsuleId ? "Save capsule before enabling collaboration" : "type something first in the capsule to enable it"}
                   >
                     Enable Collaboration
                   </button>

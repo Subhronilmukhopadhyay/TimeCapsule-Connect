@@ -3,6 +3,7 @@ import { authenticatedLoader, redirectIfAuthenticatedLoader } from './services/a
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ViewCapsule from './pages/viewCapsule';
 import TimeCapsulePage from './pages/TimeCapsulePage';
 import CollaborativeCapsulePage from './pages/CollaborativeCapsulePage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -64,6 +65,11 @@ const router = createBrowserRouter([
   //   element: <Dashboard />,
   //   loader: authenticatedLoader(),
   // },
+  {
+    path: '/view-capsule/:id',
+    element: <ViewCapsule />,
+    loader: authenticatedLoader(),
+  },
   {
     path: '/create-capsule',
     element: <TimeCapsulePage />,

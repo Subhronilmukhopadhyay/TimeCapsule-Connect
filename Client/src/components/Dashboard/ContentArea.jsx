@@ -11,7 +11,7 @@ const ContentArea = () => {
   useEffect(() => {
     const fetchCapsules = async () => {
       try {
-        const res = await api.get(`/view/capsule`);
+        const res = await api.get(`/view/capsule/user`);
         console.log(res.data);
         setCapsules(res.data);
       } catch (err) {

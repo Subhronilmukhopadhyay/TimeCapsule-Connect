@@ -24,12 +24,13 @@ import styles from '../styles/Create-Capsule.module.css';
  */
 const CreateCapsuleContent = () => {
   // Destructure editor states and actions from context
-  const { 
+  const {
     editor,
     value,
     setValue,
     capsuleTitle,
     setCapsuleTitle,
+    capsuleId,
     isLoading,
     isSaving,
     isCollaborative,
@@ -84,7 +85,8 @@ const CreateCapsuleContent = () => {
     >
       <div className={styles.createCapsulePage}>
         {/* Top navigation bar */}
-        <NavBar 
+        <NavBar
+          capsuleId={capsuleId} 
           title={capsuleTitle}
           onTitleChange={(e) => setCapsuleTitle(e.target.value)}
           onPreview={openPreviewModal}

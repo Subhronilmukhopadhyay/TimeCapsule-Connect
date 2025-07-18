@@ -5,6 +5,32 @@ import { pool } from '../config/db.js';
 import 'dotenv/config';
 
 /**
+ * Enable/diable collaboration mode for a capsule
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
+export const setCapsuleCollab = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isCollab } = req.body;
+
+    const capsule = await Capsule.findById(id);
+    if (!capsule) {
+      return res.status(404).json({ error: 'Capsule not found' });
+    }
+
+    capsule.isCollab = isCollab;
+    await capsule.save();
+
+    return res.status(200).json({ message: `Collaboration ${isCollab ? 'enabled' : 'disabled'} successfully` });
+  } catch (error) {
+    console.error('Error updating collaboration mode:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+/**
  * getting the working capsule collab mode
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
@@ -171,7 +197,7 @@ export const getCollaborator = async (req, res) => {
 };
 
 /**
- * Get all the capsules
+ * Get all the capsules of the user
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @returns {Promise<void>}
@@ -213,21 +239,36 @@ export const userCapsules = async (req, res) => {
  */
 export const capsules = async (req, res) => {
   try {
-    const capsules = await Capsule.find();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    return res.status(200).json(
-      capsules.map(capsule => ({
-        id: capsule._id,
-        title: capsule.title,
-        content: capsule.content,
-        inMaking: capsule.inMaking,
-        locked: capsule.locked,
-        unlockDate: capsule.unlockDate,
-        unlockLocation: capsule.unlockLocation
-      }))
-    );
+    const [capsules, total] = await Promise.all([
+      Capsule.find()
+        .sort({ createdAt: -1 }) // optional: latest first
+        .skip(skip)
+        .limit(limit),
+      Capsule.countDocuments()
+    ]);
+
+    const formattedCapsules = capsules.map(capsule => ({
+      id: capsule._id,
+      title: capsule.title,
+      content: capsule.content,
+      inMaking: capsule.inMaking,
+      locked: capsule.locked,
+      unlockTime: capsule.unlockDate,    
+      location: capsule.unlockLocation    
+    }));
+
+    return res.status(200).json({
+      data: formattedCapsules,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      hasMore: skip + capsules.length < total,
+    });
   } catch (error) {
-    console.error('Error fetching user capsules:', error);
+    console.error('Error fetching capsules:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 };

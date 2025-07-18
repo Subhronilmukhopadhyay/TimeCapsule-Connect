@@ -79,8 +79,8 @@
 
 // export default CapsuleList;
 
-
 import { useEffect, useState, useRef, useCallback } from 'react';
+import api from '../../../services/api';
 import CapsuleCard from '../CapsuleCard';
 
 const CapsuleList = () => {
@@ -88,37 +88,51 @@ const CapsuleList = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(false);
   const loader = useRef(null);
 
   const fetchCapsules = useCallback(async () => {
+    if (loading) return; // Prevent concurrent requests
+    
     try {
-      const res = await fetch(`/api/capsules?page=${page}`);
-      const data = await res.json();
+      setLoading(true);
+      const res = await api.get(`/view/capsule?page=${page}&limit=10`);
+      const { data: newCapsules, hasMore: more } = res.data;
 
-      if (data.length === 0) {
+      if (newCapsules.length === 0 || !more) {
         setHasMore(false);
-      } else {
-        setCapsules((prev) => [...prev, ...data]);
       }
+      
+      setCapsules((prev) => {
+        // Remove duplicates by checking if capsule already exists
+        const existingIds = new Set(prev.map(c => c.id));
+        const uniqueNewCapsules = newCapsules.filter(c => !existingIds.has(c.id));
+        return [...prev, ...uniqueNewCapsules];
+      });
     } catch (error) {
       console.error("Failed to fetch capsules:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [page]);
+  }, [page, loading]);
 
+  // Initial load - only run once
   useEffect(() => {
     setCapsules([]);
     setPage(1);
     setHasMore(true);
   }, []);
 
+  // Fetch capsules when page changes
   useEffect(() => {
-    if (page === 1) fetchCapsules();
-  }, [fetchCapsules, page]);
+    fetchCapsules();
+  }, [page]);
 
+  // Intersection observer for infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore) {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           setPage((prev) => prev + 1);
         }
       },
@@ -131,7 +145,7 @@ const CapsuleList = () => {
     return () => {
       if (currentLoader) observer.unobserve(currentLoader);
     };
-  }, [loader, hasMore]);
+  }, [hasMore, loading]);
 
   // Get user location
   useEffect(() => {
@@ -163,7 +177,7 @@ const CapsuleList = () => {
   const now = new Date();
   const nearFutureThreshold = 3 * 24 * 60 * 60 * 1000; // 3 days
   const nearbyDistanceThreshold = 10; // 10 km
-
+  
   const locked = capsules.filter((c) => {
     if (!c.locked) return false;
 
@@ -184,7 +198,7 @@ const CapsuleList = () => {
     return unlockSoon || isNearby;
   });
 
-  const unlocked = capsules.filter((c) => !c.locked);
+  const unlocked = capsules.filter((c) => !c.locked && !c.inMaking);
 
   return (
     <div className="space-y-8">
@@ -192,8 +206,8 @@ const CapsuleList = () => {
         <h3 className="text-xl font-semibold">🔒 Locked Capsules</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {locked.length > 0 ? (
-            locked.map((capsule, idx) => (
-              <CapsuleCard key={idx} capsule={capsule} />
+            locked.map((capsule) => (
+              <CapsuleCard key={capsule.id} capsule={capsule} />
             ))
           ) : (
             <p className="text-sm text-gray-400">
@@ -207,8 +221,8 @@ const CapsuleList = () => {
         <h3 className="text-xl font-semibold">🔓 Unlocked Capsules</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {unlocked.length > 0 ? (
-            unlocked.map((capsule, idx) => (
-              <CapsuleCard key={idx} capsule={capsule} />
+            unlocked.map((capsule) => (
+              <CapsuleCard key={capsule.id} capsule={capsule} />
             ))
           ) : (
             <p className="text-sm text-gray-400">No unlocked capsules</p>

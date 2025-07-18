@@ -78,6 +78,21 @@ export const autoSaveCapsule = async (id, title, content) => {
 };
 
 /**
+ * Loads a capsule by ID for only-view
+ * @param {string} id - The capsule ID to load
+ * @returns {Promise<Object>} - The capsule data
+ */
+export const loadViewCapsule = async (id) => {
+  try {
+    const { data } = await api.get(`/view/capsule/${id}`);
+    return data;
+  } catch (error) {
+    console.error('Error loading capsule:', error);
+    throw error;
+  }
+};
+
+/**
  * Loads a capsule by ID
  * @param {string} id - The capsule ID to load
  * @returns {Promise<Object>} - The capsule data

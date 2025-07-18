@@ -223,3 +223,10 @@
 .lockBtn:hover {
   background-color: #345bdb;
 }
+
+.disabledButton {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  pointer-events: all; /* keep pointer for tooltip */
+}
