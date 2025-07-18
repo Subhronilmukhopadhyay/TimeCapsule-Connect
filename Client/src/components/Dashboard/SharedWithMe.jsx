@@ -66,6 +66,7 @@
 
 
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import CapsuleCard from './CapsuleCard.jsx';
 
@@ -78,7 +79,7 @@ const SharedCapsules = () => {
     const fetchSharedCapsules = async () => {
       try {
         const res = await api.get('/view/capsule?collab=true');
-        const data = res.data;
+        const data = res.data.data; // ensure this is the correct path
         setCapsules(data);
       } catch (err) {
         setError(err.message || 'Something went wrong');
@@ -91,8 +92,8 @@ const SharedCapsules = () => {
   }, []);
 
   const locked = capsules.filter((c) => c.locked);
-  const inMaking = capsules.filter((c) => !c.locked && c.inProgress); // or any similar flag
-  const unlocked = capsules.filter((c) => !c.locked && !c.inProgress);
+  const inMaking = capsules.filter((c) => !c.locked && c.inMaking);
+  const unlocked = capsules.filter((c) => !c.locked && !c.inMaking);
 
   return (
     <div className="p-4">
@@ -103,6 +104,7 @@ const SharedCapsules = () => {
 
       {!loading && !error && (
         <>
+          {/* 🔒 Locked Capsules */}
           <section className="mb-6">
             <h3 className="text-xl font-semibold mb-2">🔒 Locked</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -116,26 +118,38 @@ const SharedCapsules = () => {
             </div>
           </section>
 
+          {/* 🛠️ In Making Capsules */}
           <section className="mb-6">
-            <h3 className="text-xl font-semibold mb-2">🛠️ In-Making</h3>
+            <h3 className="text-xl font-semibold mb-2">🛠️ In Making</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {inMaking.length ? (
-                inMaking.map((capsule, idx) => (
-                  <CapsuleCard key={idx} capsule={capsule} />
-                ))
+                inMaking.map((capsule, idx) => {
+                  const capsuleId = capsule._id || capsule.id;
+                  return (
+                    <Link to={`/create-capsule/${capsuleId}`} key={idx}>
+                      <CapsuleCard capsule={capsule} />
+                    </Link>
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-400">No capsules in making</p>
               )}
             </div>
           </section>
 
+          {/* 🔓 Unlocked Capsules */}
           <section>
             <h3 className="text-xl font-semibold mb-2">🔓 Unlocked</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {unlocked.length ? (
-                unlocked.map((capsule, idx) => (
-                  <CapsuleCard key={idx} capsule={capsule} />
-                ))
+                unlocked.map((capsule, idx) => {
+                  const capsuleId = capsule._id || capsule.id;
+                  return (
+                    <Link to={`/view-capsule/${capsuleId}`} key={idx}>
+                      <CapsuleCard capsule={capsule} />
+                    </Link>
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-400">No unlocked shared capsules</p>
               )}

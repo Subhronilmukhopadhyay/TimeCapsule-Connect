@@ -32,15 +32,23 @@ const ContentArea = () => {
       <h3 className="text-xl font-semibold mb-4">All Capsules</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {capsules.length ? (
-          capsules.map((capsule, idx) => (
-            capsule.locked ? (
-              <CapsuleCard key={idx} capsule={capsule} />
-            ) : (
-              <Link to={`/view-capsule/${capsule._id || capsule.id}`} key={idx}>
-                <CapsuleCard capsule={capsule} />
-              </Link>
-            )
-          ))
+          capsules.map((capsule, idx) => {
+          const capsuleId = capsule._id || capsule.id;
+
+          if (capsule.locked) {
+            return <CapsuleCard key={idx} capsule={capsule} />;
+          }
+
+          const linkPath = capsule.inMaking
+            ? `/create-capsule/${capsuleId}`
+            : `/view-capsule/${capsuleId}`;
+
+          return (
+            <Link to={linkPath} key={idx}>
+              <CapsuleCard capsule={capsule} />
+            </Link>
+          );
+        })
         ) : (
           <p className="text-sm text-gray-400">No capsules found</p>
         )}

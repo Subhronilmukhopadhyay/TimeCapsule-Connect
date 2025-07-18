@@ -12,7 +12,7 @@ const MyCapsules = () => {
     const fetchUserCapsules = async () => {
       try {
         const res = await api.get('/view/capsule');
-        setCapsules(res.data);
+        setCapsules(res.data.data);
       } catch (err) {
         setError(err.message || 'Something went wrong');
       } finally {
