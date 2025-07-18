@@ -436,3 +436,232 @@
     border: none;
   }
 }
+
+/* Add these to your View-Capsule.module.css */
+.imageContainer, .videoContainer, .audioContainer, .fileContainer {
+  margin: 16px 0;
+  text-align: center;
+}
+
+.mediaLoading, .mediaError {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.mediaError {
+  color: #dc3545;
+}
+
+.readOnlyEditor {
+  min-height: 400px;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+.progressContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.progressBar {
+  height: 100%;
+  background: #007bff;
+  transition: width 0.3s ease;
+}
+
+/* Add these styles to your View-Capsule.module.css */
+
+/* Zoom Controls */
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 12px;
+  padding: 0 12px;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+}
+
+.zoomLevel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  min-width: 50px;
+  text-align: center;
+  user-select: none;
+}
+
+.darkMode .zoomLevel {
+  color: #ccc;
+}
+
+.darkMode .zoomControls {
+  border-color: #444;
+}
+
+/* Action button disabled state */
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.actionButton:disabled:hover {
+  background-color: transparent;
+}
+
+/* Content container adjustments for zoom */
+.viewContent {
+  overflow: auto;
+  min-height: calc(100vh - 120px);
+  padding: 20px 0;
+}
+
+.contentContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 20px;
+  will-change: transform;
+}
+
+/* Ensure proper spacing when zoomed */
+.contentContainer img,
+.contentContainer video,
+.contentContainer audio {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Print styles that respect zoom */
+@media print {
+  .viewContent {
+    overflow: visible;
+    transform: scale(var(--zoom-level, 1)) !important;
+  }
+  
+  .headerActions {
+    display: none;
+  }
+  
+  .progressContainer {
+    display: none;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .zoomControls {
+    display: none; /* Hide zoom controls on mobile for space */
+  }
+  
+  .headerActions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* Smooth scrolling when zoomed */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure content doesn't overflow horizontally when zoomed */
+.viewContent {
+  overflow-x: auto;
+}
+
+/* Header layout adjustments */
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+/* Tooltip styles for zoom buttons */
+.actionButton[title] {
+  position: relative;
+}
+
+.actionButton[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+/* Zoom level indicator styling */
+.zoomLevel {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+}
+
+.darkMode .zoomLevel {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Content scaling improvements */
+.contentContainer {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Ensure media elements scale properly */
+.imageContainer,
+.videoContainer,
+.audioContainer {
+  transition: transform 0.3s ease;
+}
+
+/* Prevent layout shifts during zoom */
+.readOnlyEditor {
+  transform-origin: top center;
+}
+
+/* Loading and error states during zoom */
+.loadingContainer,
+.errorContainer {
+  transform: scale(var(--zoom-level, 1));
+  transform-origin: center;
+}
+
+/* Accessibility improvements */
+.actionButton:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .zoomControls {
+    border-color: #000;
+  }
+  
+  .darkMode .zoomControls {
+    border-color: #fff;
+  }
+}
+
+.zoomScrollContainer {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}

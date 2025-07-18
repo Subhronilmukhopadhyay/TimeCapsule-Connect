@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { connectDB } from './config/db.js';
+import unlockScheduler from './utils/unlockScheduler.js';
 import securityMiddleware from './middleware/security.js';
 import authRoutes from './routes/authRoutes.js';
 import CreateCapsuleRoutes from './routes/createCapsuleRoutes.js';
@@ -11,6 +12,9 @@ const app = express();
 
 // Database Connection
 connectDB();
+
+//cron-job for every 30 mins to see if locked capsule can be now unlocked
+unlockScheduler();
 
 // Middleware
 app.use(express.json());
