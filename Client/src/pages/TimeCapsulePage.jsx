@@ -5,7 +5,7 @@ import { Slate } from 'slate-react';
 import { EditorProvider, useEditor } from '../services/EditorContext';
 
 // Capsule UI Components
-import NavBar from '../components/Create-capsule/Navbar/NavBar';
+import NavBar from '../components/Create-capsule/Navbar/Navbar';
 import LeftSidebar from '../components/Create-capsule/SidebarLeft/SidebarLeft';
 import ContentArea from '../components/Create-capsule/ContentArea/ContentArea';
 import RightSidebar from '../components/Create-capsule/RightSidebar/RightSidebar';
