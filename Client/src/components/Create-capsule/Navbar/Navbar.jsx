@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import api from '../../../services/api'
 import styles from './Navbar.module.css';
 
-const Navbar = ({
+const NavBar = ({
   capsuleId, 
   title, 
   onTitleChange, 
@@ -166,4 +166,4 @@ const Navbar = ({
   );
 };
 
-export default Navbar;
+export default NavBar;
