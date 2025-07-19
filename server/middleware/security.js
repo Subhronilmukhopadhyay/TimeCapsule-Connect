@@ -16,14 +16,14 @@ const securityMiddleware = (app) => {
     credentials: true 
   }));
 
-  const csrfProtection = csrf({ cookie: true }); // development mode
-  // const csrfProtection = csrf({ //production mode
-  //   cookie: {
-  //     httpOnly: false,
-  //     secure: process.env.NODE_ENV === 'production',
-  //     sameSite: 'None',
-  //   }
-  // });
+  // const csrfProtection = csrf({ cookie: true }); // development mode
+  const csrfProtection = csrf({ //production mode
+    cookie: {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'None',
+    }
+  });
 
   app.use(cookieParser());
   app.use(csrfProtection);
@@ -41,9 +41,9 @@ const securityMiddleware = (app) => {
 
     res.cookie('XSRF-TOKEN', csrfToken, {
         httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'None', //production mode
-        sameSite: 'Strict', //development mode
+        secure: true,
+        sameSite: 'None', //production mode
+        // sameSite: 'Strict', //development mode
         maxAge: 3600000,
     });
     res.status(200).json({ message: 'CSRF token set in cookie' });
