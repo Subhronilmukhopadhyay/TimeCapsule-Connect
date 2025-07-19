@@ -7,18 +7,13 @@ const api = axios.create({
 });
 
 const getCSRFToken = () => {
-  // First try to get from cookie
   const csrfCookie = document.cookie
     .split('; ')
     .find(row => row.startsWith('XSRF-TOKEN=') || row.startsWith('csrftoken='));
   
   if (csrfCookie) {
-    let token = csrfCookie.split('=')[1];
-    // URL decode the token if it's encoded
-    return decodeURIComponent(token);
+    return csrfCookie.split('=')[1];
   }
-  
-  // Fallback to meta tag
   const metaTag = document.querySelector('meta[name="csrf-token"]');
   if (metaTag) {
     return metaTag.getAttribute('content');
@@ -31,10 +26,8 @@ api.interceptors.request.use(config => {
   const csrfToken = getCSRFToken();
   console.log('Using CSRF token:', csrfToken);
   if (csrfToken) {
-    // Use multiple header formats for compatibility
-    config.headers['X-CSRF-Token'] = csrfToken;
+    // config.headers['CSRF-Token'] = csrfToken;
     config.headers['x-csrf-token'] = csrfToken;
-    config.headers['_token'] = csrfToken;
   }
   
   return config;

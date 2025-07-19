@@ -16,61 +16,37 @@ const securityMiddleware = (app) => {
     credentials: true 
   }));
 
-  app.use(cookieParser());
-
-  // FIXED: Configure CSRF properly for production
-  const csrfProtection = csrf({
+  // const csrfProtection = csrf({ cookie: true }); // development mode
+  const csrfProtection = csrf({ //product
     cookie: {
-      key: '_csrf', // Use a consistent key
-      httpOnly: false, // IMPORTANT: Must be false for client-side access
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',
-      maxAge: 3600000, // 1 hour
-    },
-    // Add custom value function to handle different header formats
-    value: function (req) {
-      return (
-        req.body && req.body._token ||
-        req.query && req.query._token ||
-        req.headers['csrf-token'] ||
-        req.headers['x-csrf-token'] ||
-        req.headers['x-xsrf-token']
-      );
+      sameSite: 'None',  // This is the fix
     }
   });
 
+  app.use(cookieParser());
   app.use(csrfProtection);
 
   // Increase body size limits
   app.use(bodyParser.json({ limit: '400mb' }));
   app.use(bodyParser.urlencoded({ limit: '400mb', extended: true }));
 
+  // You might also need:
   app.use(express.json({ limit: '400mb' }));
   app.use(express.urlencoded({ limit: '400mb', extended: true }));
 
-  // FIXED: Improved CSRF token endpoint
   app.get('/csrf-token', (req, res) => {
-    try {
-      const csrfToken = req.csrfToken();
-      
-      // Set the token in cookie with proper encoding
-      res.cookie('XSRF-TOKEN', csrfToken, {
-        httpOnly: false, // MUST be false for client access
+    const csrfToken = req.csrfToken(); 
+
+    res.cookie('XSRF-TOKEN', csrfToken, {
+        httpOnly: false,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
+        sameSite: 'None', //production mode
+        // sameSite: 'Strict', //development mode
         maxAge: 3600000,
-        encode: String // Prevent double encoding
-      });
-      
-      // Also return in response body as backup
-      res.status(200).json({ 
-        message: 'CSRF token set in cookie',
-        csrfToken: csrfToken // Include in response as fallback
-      });
-    } catch (error) {
-      console.error('CSRF token generation error:', error);
-      res.status(500).json({ error: 'Failed to generate CSRF token' });
-    }
+    });
+    res.status(200).json({ message: 'CSRF token set in cookie' });
   });
 
   const limiter = rateLimit({
