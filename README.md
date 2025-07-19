@@ -1,25 +1,46 @@
-
 # TimeCapsule Connect
 
-**TimeCapsule Connect** is an innovative platform that allows users to create, store, and share time capsules in a collaborative and interactive environment. Designed for both everyday users and power users, the platform combines a rich text editor, real-time collaboration features, and advanced location-based unlocking. Whether you're sending a message for the future or preserving memories with loved ones, TimeCapsule Connect ensures a seamless and engaging experience.
+**TimeCapsule Connect** is an innovative platform that allows users to create, store, and share time capsules in a collaborative and interactive environment. Designed for both everyday users and power users, the platform combines a rich text editor, real-time collaboration, location-based unlocking, and large media support. Whether you're sending a message to your future self or preserving memories with loved ones, TimeCapsule Connect ensures a seamless and engaging experience.
 
 ---
 
 ## ✨ Introduction
 
-TimeCapsule Connect is designed to bring the concept of time capsules into the digital age. By combining modern web technologies with an intuitive user interface, it allows you to create capsules that can be unlocked at a later time, either by yourself or by collaborators. The platform leverages Google Maps integration, real-time collaborative editing, and a hybrid text editor for a rich and seamless experience.
+TimeCapsule Connect brings the nostalgic concept of time capsules into the digital age. Users can create rich, multimedia capsules that can be unlocked in the future based on time and location constraints. With real-time collaboration, advanced editing, and cloud storage capabilities, it's perfect for both personal and group memory-keeping.
 
 ---
 
 ## 🔥 Features
 
-- **Real-Time Collaborative Editing**: Using Yjs and SlateJS for efficient and conflict-free editing.
-- **Hybrid Text Editor**: TipTap for casual users, Slate for power users with advanced features.
-- **Location-Based Unlocking**: Set a location with Google Maps’ Place Autocomplete feature to unlock your capsule.
-- **Chunked Uploads**: For large media files, supporting resumable uploads (1GB+).
-- **Secure and Scalable**: KSUID for unique and secure capsule IDs with easy scalability.
-- **Rich Media Support**: Upload images, videos, and text content with full media support.
-- **Modern UI**: Sleek, user-friendly design ensuring smooth user interaction.
+- **Real-Time Collaborative Editing**  
+  Powered by **Yjs** and **SlateJS** to enable simultaneous, conflict-free editing by multiple users.
+  
+- **Advanced Text Editor**  
+  Using **SlateJS** to offer a powerful editing experience with support for headings, lists, links, images, code blocks, and more.
+
+- **Location-Based Unlocking**  
+  Capsules can only be accessed at specific geolocations using **Google Maps’ Place Autocomplete** and Geolocation APIs.
+
+- **Time-Locked Capsules**  
+  Capsules can be scheduled to unlock at a future date/time, enforcing both temporal and spatial access constraints.
+
+- **Chunked & Resumable Uploads**  
+  Supports large files (1GB+) with resumable upload capability for robust media handling.
+
+- **Unique Capsule IDs**  
+  Capsules are identified using **KSUID**, which ensures global uniqueness and chronological sorting.
+
+- **Rich Media Support**  
+  Upload and embed videos, images, audio, and formatted text into your capsules.
+
+- **Secure Sharing**  
+  Collaborators can be invited securely through capsule links or access tokens.
+
+- **Capsule Activity Log**  
+  Track changes, editor sessions, and activity over time.
+
+- **Clean and Responsive UI**  
+  Built with a modern design aesthetic for intuitive use across devices.
 
 ---
 
@@ -27,22 +48,23 @@ TimeCapsule Connect is designed to bring the concept of time capsules into the d
 
 ### **Frontend**
 
-- **ReactJS**: Main framework for building the user interface.
-- **SlateJS** & **TipTap**: Hybrid text editors that allow flexible and advanced text manipulation.
-- **Yjs**: Real-time collaborative editing library to enable multiple users to edit simultaneously.
-- **Google Maps API**: For location-based unlocking of time capsules.
+- **ReactJS** – Component-based UI framework.
+- **SlateJS** – Feature-rich, customizable text editor.
+- **Yjs** – Peer-to-peer CRDT for real-time editing.
+- **Google Maps API** – For place selection and location-locking capsules.
 
 ### **Backend**
 
-- **Node.js**: Server-side runtime environment.
-- **MongoDB**: NoSQL database for storing capsules, user data, and media.
-- **Express.js**: Web framework to build and manage API endpoints.
-- **Socket.io**: For real-time communication (such as updates and changes in collaborative editing).
+- **Node.js** – Server environment.
+- **Express.js** – REST API framework.
+- **MongoDB** – NoSQL document store for capsules, users, and media.
+- **Socket.io** – Real-time event-based communication.
 
 ### **Others**
 
-- **KSUID**: For generating unique and time-ordered identifiers for capsules.
-- **Blob-to-Base64**: For handling and uploading media files in a base64 format.
+- **KSUID** – Collision-free, time-sortable unique ID generation.
+- **Multer + Resumable.js** – For efficient and large file uploads.
+- **Base64 Blob Handler** – Handles conversion and transfer of large media.
 
 ---
 
@@ -50,83 +72,96 @@ TimeCapsule Connect is designed to bring the concept of time capsules into the d
 
 ### **Prerequisites**
 
-Before running the project, ensure you have the following installed:
+Ensure you have the following installed:
 
 - **Node.js** (v16 or higher)
-- **MongoDB** (or a MongoDB-compatible database)
-- **npm** (Node package manager)
+- **MongoDB**
+- **npm** or **yarn**
 
-### **Setup Guide**
+### **Steps**
 
-1. **Clone the Repository**:
+1. **Clone the Repository**
 
    ```bash
    git clone https://github.com/Subhronilmukhopadhyay/timecapsule-connect.git
    cd timecapsule-connect
    ```
 
-2. **Install Dependencies**:
+2. **Install Dependencies**
 
    ```bash
    npm install
    ```
 
-3. **Create a `.env` file** in the root directory and add the following:
+3. **Configure Environment Variables**
+
+   Create a `.env` file in the root directory with:
 
    ```env
    MONGODB_URI=your_mongodb_connection_string
    GOOGLE_MAPS_API_KEY=your_google_maps_api_key
    ```
 
-4. **Start the Development Server**:
+4. **Run the Development Server**
 
    ```bash
    npm run dev
    ```
 
-   This will launch both the frontend and backend servers. You can view the app at `http://localhost:3000`.
+   Visit `http://localhost:3000` to explore the app.
 
 ---
 
 ## 🚀 Usage
 
-Once the app is running, here's how you can use it:
+- **Create a Capsule**: Compose a message, add media, set a location and unlock time.
+- **Collaborate**: Share capsule links with others for simultaneous editing.
+- **Unlock**: Capsules remain inaccessible until both the unlock time and geolocation criteria are met.
+- **View & Edit History**: Track edits and changes made over time by collaborators.
 
-- **Creating a Capsule**: Navigate to the "Create Capsule" page, add your text, images, and media, and set the unlock date and location.
-- **Collaborative Editing**: Share your capsule with others for real-time editing. They can contribute text, images, or comments.
-- **Unlocking a Capsule**: The capsule will be unlocked only when the location and time conditions are met.
-- **Media Handling**: Upload and view media, ensuring large files (1GB+) are supported via resumable uploads.
+---
+
+## 🧪 Testing
+
+- Simulate multi-user collaboration by opening capsules in multiple tabs or devices.
+- Test chunked uploads by uploading large files (~1GB+).
+- Ensure capsule unlocks only when both **time** and **location** match the preset constraints.
 
 ---
 
 ## 🤝 Contributing
 
-We welcome contributions! Whether you want to add new features, fix bugs, or improve documentation, we would love to have you.
+We welcome contributions!
 
-### How to Contribute
+### Steps to Contribute
 
-1. Fork the repository on GitHub.
-2. Clone your fork to your local machine.
-3. Create a new branch for your feature/bugfix: `git checkout -b feature/your-feature`.
-4. Commit your changes: `git commit -m 'Add new feature'`.
-5. Push to your branch: `git push origin feature/your-feature`.
-6. Open a Pull Request to the main repository.
+1. Fork the repository.
+2. Clone your fork locally.
+3. Create a feature branch: `git checkout -b feature/your-feature`
+4. Commit your changes.
+5. Push and open a Pull Request.
+
+Please ensure your code adheres to project structure and naming conventions.
 
 ---
 
-## 🛠️ Future Enhancements
+## 🌱 Planned Enhancements
 
-Here are some planned features and improvements for TimeCapsule Connect:
-
-- **Capsule Analytics**: View statistics on capsule views, interactions, and unlocks.
-- **Version History**: Track and revert to previous versions of a capsule.
-- **Notifications**: Get notified when a capsule is unlocked or when changes are made in collaborative editing.
-- **Mobile App**: A native mobile app for better accessibility and mobile-based capsule creation.
-- **Blockchain Integration**: For immutable storage and future-proofing capsules.
-
+- **Capsule Analytics** – Insights on opens, edits, and shares.
+- **Version History** – Ability to roll back to older capsule versions.
+- **Push Notifications** – Real-time alerts when capsules are unlocked or modified.
+- **Native Mobile App** – Android/iOS support for capsule creation and unlocking.
+- **Blockchain Integration** – Immutable ledger for capsule integrity and timestamp proofs.
+- **Offline Draft Support** – Work on capsules offline and sync later.
 
 ---
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+## 📬 Contact
+
+For any questions, suggestions, or feedback, feel free to reach out to us via GitHub Issues or connect on [LinkedIn](https://www.linkedin.com/in/subhronilmukhopadhyay/).
