@@ -5,7 +5,7 @@
 ---
 
 ## ✨ Introduction
-
+ 
 TimeCapsule Connect brings the nostalgic concept of time capsules into the digital age. Users can create rich, multimedia capsules that can be unlocked in the future based on time and location constraints. With real-time collaboration, advanced editing, and cloud storage capabilities, it's perfect for both personal and group memory-keeping.
 
 ---
