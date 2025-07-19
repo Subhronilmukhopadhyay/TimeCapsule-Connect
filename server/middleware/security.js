@@ -16,14 +16,14 @@ const securityMiddleware = (app) => {
     credentials: true 
   }));
 
-  // const csrfProtection = csrf({ cookie: true }); // development mode
-  const csrfProtection = csrf({ //product
-    cookie: {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None',  // This is the fix
-    }
-  });
+  const csrfProtection = csrf({ cookie: true }); // development mode
+  // const csrfProtection = csrf({ //production mode
+  //   cookie: {
+  //     httpOnly: false,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     sameSite: 'None',
+  //   }
+  // });
 
   app.use(cookieParser());
   app.use(csrfProtection);
@@ -38,7 +38,7 @@ const securityMiddleware = (app) => {
 
   app.get('/csrf-token', (req, res) => {
     const csrfToken = req.csrfToken(); 
-
+    console.log("Meow CSRF: ",csrfToken);
     res.cookie('XSRF-TOKEN', csrfToken, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production',

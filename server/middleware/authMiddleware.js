@@ -33,8 +33,8 @@ export const registerUser = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', //production mode
-      // sameSite: 'Strict', //development mode
+      // sameSite: 'None', //production mode
+      sameSite: 'Strict', //development mode
       maxAge: 3600000, 
     });
 
@@ -48,7 +48,7 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    console.log('Received CSRF header:', req.headers['x-csrf-token']);
+    // console.log('Received CSRF header:', req.headers['x-csrf-token']);
     const { email, password } = req.body;
 
     const query = 'SELECT id, username, email, password FROM userlogin WHERE email = $1';
@@ -63,8 +63,8 @@ export const loginUser = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', //production mode
-      // sameSite: 'Strict', //development mode
+      // sameSite: 'None', //production mode
+      sameSite: 'Strict', //development mode
       maxAge: 3600000,
     });
 

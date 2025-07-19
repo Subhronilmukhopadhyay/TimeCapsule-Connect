@@ -4,7 +4,7 @@ import api from './api';
 export const loginHandleSubmit = async (email, password, navigate, dispatch, authLogin) => {
   try {
     await api.get('/csrf-token');
-    
+    console.log("Hello World");
     const response = await api.post('/api/auth/login', {
       email,
       password
