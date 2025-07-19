@@ -26,7 +26,9 @@ api.interceptors.request.use(config => {
   const csrfToken = getCSRFToken();
   
   if (csrfToken) {
-    config.headers['CSRF-Token'] = csrfToken;
+    // config.headers['CSRF-Token'] = csrfToken;
+    config.headers['csrf-token'] = csrfToken;
+
   }
   
   return config;
