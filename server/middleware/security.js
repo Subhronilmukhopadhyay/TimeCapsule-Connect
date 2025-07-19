@@ -11,7 +11,8 @@ const securityMiddleware = (app) => {
   app.use(helmet());
   
   app.use(cors({ 
-    origin: 'https://timecapsule-connect-1.onrender.com',
+    // origin: 'https://timecapsule-connect-1.onrender.com', //production mode
+    origin: 'http://localhost:5173', //development mode
     credentials: true 
   }));
 
@@ -33,8 +34,9 @@ const securityMiddleware = (app) => {
 
     res.cookie('XSRF-TOKEN', csrfToken, {
         httpOnly: false,
-        secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'None',
+        secure: process.env.NODE_ENV === 'production',
+        // sameSite: 'None', //production mode
+        sameSite: 'Strict', //development mode
         maxAge: 3600000,
     });
     res.status(200).json({ message: 'CSRF token set in cookie' });
