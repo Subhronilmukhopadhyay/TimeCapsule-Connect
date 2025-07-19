@@ -48,6 +48,7 @@ export const registerUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
+    console.log('Received CSRF header:', req.headers['x-csrf-token']);
     const { email, password } = req.body;
 
     const query = 'SELECT id, username, email, password FROM userlogin WHERE email = $1';
