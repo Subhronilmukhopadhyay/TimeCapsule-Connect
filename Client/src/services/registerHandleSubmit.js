@@ -1,7 +1,7 @@
 import axios from "axios";
 export const registerHandleSubmit = async (name, username, email, phoneNo, password, confirmPassword, dateOfBirth, navigate) => {
     try{
-        const csrfResponse = await fetch('http://localhost:8000/csrf-token', {
+        const csrfResponse = await fetch('https://timecapsule-connect-server.onrender.com/csrf-token', {
             credentials: 'include'
         });
     
@@ -24,7 +24,7 @@ export const registerHandleSubmit = async (name, username, email, phoneNo, passw
             throw new Error("CSRF token is missing in the response.");
         }
 
-        const result = await axios.post("http://localhost:8000/api/auth/register", {
+        const result = await axios.post("https://timecapsule-connect-server.onrender.com/api/auth/register", {
             name, username, email, phoneNo, password, confirmPassword, dateOfBirth
         },
         {
