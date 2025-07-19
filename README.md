@@ -98,8 +98,8 @@ Ensure you have the following installed:
 #### Client `.env` file (`/client/.env`)
 
 ```env
-VITE_GOOGLE_MAPS_API_KEY=AIzaSyCujMNBgH77aDo3pLL7QzQGsQtRw8eUxRk
-VITE_MAP_ID=c7ea447102af69e9
+VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+VITE_MAP_ID=your_google_maps_map_id
 VITE_API_URL=http://localhost:8000/
 ```
 
@@ -107,12 +107,12 @@ VITE_API_URL=http://localhost:8000/
 
 ```env
 PORT=8000
-MONGO_URI=mongodb+srv://subhronilmukhopadhyay:kSfE8FKLiruFsjEs@cluster0.2gel3mn.mongodb.net/
+MONGO_URI=your_mongodb_connection_string
 NODE_ENV=development
-DATABASE_URL=postgresql://neondb_owner:npg_FMqJfXl6w2Bp@ep-tiny-bar-a1otf271-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
-JWT_SECRET=adfa5bfbfaa04ec2d2fd49207d0e98b05565594f4866f4495803ad0de90752c67e4a1d36c693965a34f0b883d3044d47f0932790570caf48b0030eba602310e3
-GOOGLE_APPLICATION_CREDENTIALS=./config/Capsule-media-upload.json
-GOOGLE_DRIVE_FOLDER_ID=118CHPnHAnEuwHWl0j2I_N071HhsjJJBr
+DATABASE_URL=your_postgresql_connection_string
+JWT_SECRET=your_jwt_secret
+GOOGLE_APPLICATION_CREDENTIALS=./config/your_google_credentials.json
+GOOGLE_DRIVE_FOLDER_ID=your_google_drive_folder_id
 ```
 
 4. **Run the Development client**
