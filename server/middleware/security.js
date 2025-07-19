@@ -16,7 +16,14 @@ const securityMiddleware = (app) => {
     credentials: true 
   }));
 
-  const csrfProtection = csrf({ cookie: true });
+  // const csrfProtection = csrf({ cookie: true }); // development mode
+  const csrfProtection = csrf({ //production mode
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'None',  // This is the fix
+    }
+  });
 
   app.use(cookieParser());
   app.use(csrfProtection);
