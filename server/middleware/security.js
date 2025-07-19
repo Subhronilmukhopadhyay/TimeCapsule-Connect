@@ -34,7 +34,7 @@ const securityMiddleware = (app) => {
     res.cookie('XSRF-TOKEN', csrfToken, {
         httpOnly: false,
         secure: process.env.NODE_ENV === 'production', 
-        sameSite: 'Strict',
+        sameSite: 'None',
         maxAge: 3600000,
     });
     res.status(200).json({ message: 'CSRF token set in cookie' });
