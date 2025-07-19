@@ -95,20 +95,47 @@ Ensure you have the following installed:
 
 3. **Configure Environment Variables**
 
-   Create a `.env` file in the root directory with:
+#### Client `.env` file (`/client/.env`)
 
-   ```env
-   MONGODB_URI=your_mongodb_connection_string
-   GOOGLE_MAPS_API_KEY=your_google_maps_api_key
-   ```
+```env
+VITE_GOOGLE_MAPS_API_KEY=AIzaSyCujMNBgH77aDo3pLL7QzQGsQtRw8eUxRk
+VITE_MAP_ID=c7ea447102af69e9
+VITE_API_URL=http://localhost:8000/
+```
 
-4. **Run the Development Server**
+#### Server `.env` file (`/server/.env`)
+
+```env
+PORT=8000
+MONGO_URI=mongodb+srv://subhronilmukhopadhyay:kSfE8FKLiruFsjEs@cluster0.2gel3mn.mongodb.net/
+NODE_ENV=development
+DATABASE_URL=postgresql://neondb_owner:npg_FMqJfXl6w2Bp@ep-tiny-bar-a1otf271-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+JWT_SECRET=adfa5bfbfaa04ec2d2fd49207d0e98b05565594f4866f4495803ad0de90752c67e4a1d36c693965a34f0b883d3044d47f0932790570caf48b0030eba602310e3
+GOOGLE_APPLICATION_CREDENTIALS=./config/Capsule-media-upload.json
+GOOGLE_DRIVE_FOLDER_ID=118CHPnHAnEuwHWl0j2I_N071HhsjJJBr
+```
+
+4. **Run the Development client**
 
    ```bash
    npm run dev
    ```
 
    Visit `http://localhost:3000` to explore the app.
+
+5. **Run the Development Server**
+
+   ```bash
+   nodemon server
+   ```
+
+   Visit `http://localhost:8000` to start the server.
+
+6. **Run the Development websocket**
+
+   ```bash
+   HOST=localhost PORT=1234 npx y-websocket
+   ```
 
 ---
 
