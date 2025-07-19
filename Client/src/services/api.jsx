@@ -7,6 +7,7 @@ const api = axios.create({
 });
 
 const getCSRFToken = () => {
+  console.log(document.cookie);
   const csrfCookie = document.cookie
     .split('; ')
     .find(row => row.startsWith('XSRF-TOKEN=') || row.startsWith('csrftoken='));
