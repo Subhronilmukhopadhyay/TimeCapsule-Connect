@@ -1,5 +1,5 @@
 # TimeCapsule Connect
-
+ 
 **TimeCapsule Connect** is an innovative platform that allows users to create, store, and share time capsules in a collaborative and interactive environment. Designed for both everyday users and power users, the platform combines a rich text editor, real-time collaboration, location-based unlocking, and large media support. Whether you're sending a message to your future self or preserving memories with loved ones, TimeCapsule Connect ensures a seamless and engaging experience.
 
 ---
