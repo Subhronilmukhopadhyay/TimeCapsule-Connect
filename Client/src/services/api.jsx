@@ -7,7 +7,6 @@ const api = axios.create({
 });
 
 const getCSRFToken = () => {
-  console.log(document.cookie);
   const csrfCookie = document.cookie
     .split('; ')
     .find(row => row.startsWith('XSRF-TOKEN=') || row.startsWith('csrftoken='));
@@ -27,8 +26,8 @@ api.interceptors.request.use(config => {
   const csrfToken = getCSRFToken();
   console.log('Using CSRF token:', csrfToken);
   if (csrfToken) {
-    // config.headers['CSRF-Token'] = csrfToken;
-    config.headers['x-csrf-token'] = csrfToken;
+    config.headers['CSRF-Token'] = csrfToken;
+    // config.headers['x-csrf-token'] = csrfToken;
   }
   
   return config;

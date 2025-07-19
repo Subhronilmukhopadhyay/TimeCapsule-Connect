@@ -99,7 +99,7 @@ function Login() {
             <span className={styles.policyText}>By continuing, you agree to our </span>
             <Link to="/privacy-policy" className={styles.policyLink}>Privacy Policy</Link>
             <span className={styles.policyText}> and </span>
-            <Link to="/security" className={styles.policyLink}>Security Policy</Link>
+            <Link to="/security-policy" className={styles.policyLink}>Security Policy</Link>
           </div>
         </div>
       </div>

@@ -16,6 +16,10 @@ import ContentArea from '../src/components/Dashboard/ContentArea.jsx'
 import Explore from '../src/components/Dashboard/Explore.jsx'
 import MyCapsules from './components/Dashboard/MyCapsules.jsx';
 import SharedWithMe from './components/Dashboard/SharedWithMe.jsx'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import SecurityPolicy from './pages/SecurityPolicy'
+import TermsOfService from './pages/TermsOfService';
+
 const router = createBrowserRouter([
   { 
     path: '/', 
@@ -79,7 +83,19 @@ const router = createBrowserRouter([
     path: '/create-capsule/:id',
     element: <CollaborativeCapsulePage />,
     loader: authenticatedLoader(),
-  }, 
+  },
+  {
+    path: '/privacy-policy',
+    element: <PrivacyPolicy />,
+  },
+  {
+    path: '/security-policy',
+    element: <SecurityPolicy />,
+  },
+  {
+  path: '/terms-of-service',
+    element: <TermsOfService />,
+  },
   {
     path: '*',
     element: <NotFoundPage />,

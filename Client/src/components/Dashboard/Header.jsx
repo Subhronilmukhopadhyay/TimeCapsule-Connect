@@ -181,9 +181,10 @@
 
 
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
+import useLogout from '../../services/logout';
 import { logout as authLogout } from '../../store/slices/authSlice';
 // import { Howl } from 'howler'; // For sound effect
 // import axios from 'axios';
@@ -191,6 +192,8 @@ import { logout as authLogout } from '../../store/slices/authSlice';
 const Header = ({ isOpen }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const navigate = useNavigate();
 
   // ✅ Dummy notifications with isRead field
   const [notifications, setNotifications] = useState([
@@ -204,11 +207,14 @@ const Header = ({ isOpen }) => {
   const bellRef = useRef(null);
 
   const authData = useSelector((state) => state.auth.userData?.username);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(authLogout());
+  const logout = useLogout();
+  const handleLogout = async () => {
+    await logout();
+    setShowDropdown?.(false);
     setShowDropdown(false);
+    navigate('/');
   };
 
   const toggleDropdown = () => {

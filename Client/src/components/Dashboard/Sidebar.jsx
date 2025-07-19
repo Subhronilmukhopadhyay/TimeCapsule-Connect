@@ -1,14 +1,16 @@
 // src/components/Dashboard/Sidebar.jsx
 import { useDispatch } from 'react-redux';
 import { logout as authLogout } from '../../store/slices/authSlice';
+import useLogout from '../../services/logout';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(authLogout());
+  const logout = useLogout();
+  const handleLogout = async () => {
+    await logout();
     setIsOpen(false);
     navigate('/');
   };
