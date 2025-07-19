@@ -17,13 +17,22 @@ const securityMiddleware = (app) => {
   }));
 
   // const csrfProtection = csrf({ cookie: true }); // development mode
-  const csrfProtection = csrf({ //production mode
+  const csrfProtection = csrf({ //production mode'
     cookie: {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'None',
     }
   });
+
+  const csrfCookieSettings = {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'None',
+    domain: '.onrender.com'
+  };
+
+  console.log('CSRF cookie config:', csrfCookieSettings);
 
   app.use(cookieParser());
   app.use(csrfProtection);
