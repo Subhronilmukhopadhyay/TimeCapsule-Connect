@@ -26,5 +26,13 @@ app.use('/media-handle',mediaHandle);
 app.use('/create/capsule', CreateCapsuleRoutes);
 app.use('/view/capsule', ViewCapsuleRoutes);
 
+app.use((err, req, res, next) => {
+  if (err.code === 'EBADCSRFTOKEN') {
+    console.error('❌ Invalid CSRF token');
+    return res.status(403).json({ error: 'Invalid CSRF token' });
+  }
+  next(err);
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
