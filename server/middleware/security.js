@@ -46,7 +46,7 @@ const securityMiddleware = (app) => {
         // sameSite: 'Strict', //development mode
         maxAge: 3600000,
     });
-    res.status(200).json({ message: 'CSRF token set in cookie' });
+    res.status(200).json({ csrfToken });
   });
 
   const limiter = rateLimit({
