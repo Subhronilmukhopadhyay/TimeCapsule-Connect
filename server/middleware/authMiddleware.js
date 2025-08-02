@@ -54,17 +54,17 @@ export const loginUser = async (req, res) => {
     const query = 'SELECT id, username, email, password FROM userlogin WHERE email = $1';
     const { rows } = await pool.query(query, [email]);
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
-    console.log("HERE-1");
+
     const user = rows[0];
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     res.cookie('token', token, {
-      httpOnly: false, 
+      httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', //production mode
-      // sameSite: 'Strict', //development mode
+      // sameSite: 'None', //production mode
+      sameSite: 'Strict', //development mode
       maxAge: 3600000,
     });
 

@@ -27,9 +27,8 @@ const fetchCSRFToken = async () => {
   return response.data.csrfToken;
 };
 
-api.interceptors.request.use(async config => {
-  const csrfToken = await fetchCSRFToken(); // dynamic token fetch
-  // const csrfToken = getCSRFToken();
+api.interceptors.request.use(config => {
+  const csrfToken = getCSRFToken();
   console.log('Using CSRF token:', csrfToken);
   if (csrfToken) {
     config.headers['CSRF-Token'] = csrfToken;
