@@ -13,7 +13,6 @@ const securityMiddleware = (app) => {
   app.use(cors({ 
     // origin: 'https://timecapsule-connect-1.onrender.com', //production mode
     origin: 'http://localhost:5173', //development mode
-    // origin: "https://timecapsule-connect-nc1a.onrender.com",
     credentials: true 
   }));
 
