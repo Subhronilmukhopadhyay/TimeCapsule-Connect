@@ -13,7 +13,7 @@ const securityMiddleware = (app) => {
   app.use(helmet());
 
   app.use(cors({
-    origin: isProduction ? 'https://your-production-client-url.com' : 'http://localhost:5173',
+    origin: isProduction ? 'https://timecapsule-connect-1.onrender.com' : 'http://localhost:5173',
     credentials: true
   }));
 
