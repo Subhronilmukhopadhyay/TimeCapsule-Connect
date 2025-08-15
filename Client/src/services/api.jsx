@@ -22,10 +22,10 @@ const getCSRFToken = () => {
   return null;
 };
 
-const fetchCSRFToken = async () => {
-  const response = await api.get('/csrf-token');
-  return response.data.csrfToken;
-};
+// const fetchCSRFToken = async () => {
+//   const response = await api.get('/csrf-token');
+//   return response.data.csrfToken;
+// };
 
 api.interceptors.request.use(config => {
   const csrfToken = getCSRFToken();

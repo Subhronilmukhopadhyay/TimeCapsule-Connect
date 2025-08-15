@@ -8,45 +8,45 @@ import authenticate from '../controllers/authController.js';
 import bodyParser from 'body-parser';
 
 const securityMiddleware = (app) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+
   app.use(helmet());
-  
-  app.use(cors({ 
-    // origin: 'https://timecapsule-connect-1.onrender.com', //production mode
-    origin: 'http://localhost:5173', //development mode
-    credentials: true 
+
+  app.use(cors({
+    origin: isProduction ? 'https://your-production-client-url.com' : 'http://localhost:5173',
+    credentials: true
   }));
 
-  const csrfProtection = csrf({ cookie: true }); // development mode
-  // const csrfProtection = csrf({ //production mode
-  //   cookie: {
-  //     httpOnly: false,
-  //     secure: process.env.NODE_ENV === 'production',
-  //     sameSite: 'None',
-  //   }
-  // });
-
+  // Must come before csrf
   app.use(cookieParser());
+
+  // 1. Correctly configure the CSRF middleware's SECRET cookie for production
+  const csrfProtection = csrf({
+    cookie: {
+      httpOnly: true, // The secret cookie should NOT be readable by JS
+      secure: isProduction, // Must be true in production (requires HTTPS)
+      sameSite: isProduction ? 'None' : 'Lax', // 'None' for cross-site, 'Lax' for same-site dev
+    }
+  });
+
   app.use(csrfProtection);
 
-  // Increase body size limits
-  app.use(bodyParser.json({ limit: '400mb' }));
-  app.use(bodyParser.urlencoded({ limit: '400mb', extended: true }));
-
-  // You might also need:
   app.use(express.json({ limit: '400mb' }));
   app.use(express.urlencoded({ limit: '400mb', extended: true }));
 
+  // This endpoint creates the READABLE token for your client-side script
   app.get('/csrf-token', (req, res) => {
-    const csrfToken = req.csrfToken(); 
+    const csrfToken = req.csrfToken();
 
+    // 2. Correctly configure the READABLE token cookie
     res.cookie('XSRF-TOKEN', csrfToken, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === 'production',
-        // sameSite: 'None', //production mode
-        sameSite: 'Strict', //development mode
-        maxAge: 3600000,
+      httpOnly: false, // This MUST be false so document.cookie can read it
+      secure: isProduction, // Must match the secret cookie's setting
+      sameSite: isProduction ? 'None' : 'Lax', // Must match the secret cookie's setting
+      maxAge: 3600000, // 1 hour
     });
-    res.status(200).json({ message: 'CSRF token set in cookie' });
+
+    res.status(200).json({ csrfToken: csrfToken }); // Also send it in the body as a fallback
   });
 
   const limiter = rateLimit({
