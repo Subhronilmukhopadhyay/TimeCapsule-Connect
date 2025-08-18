@@ -5,6 +5,8 @@ export const loginHandleSubmit = async (email, password, navigate, dispatch, aut
   try {
     await api.get('/csrf-token');
     console.log("HERE-1");
+    await new Promise(resolve => setTimeout(resolve, 50)); 
+    console.log("Cookie should now be set:", document.cookie);
     const response = await api.post('/api/auth/login', {
       email,
       password
