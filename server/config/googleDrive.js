@@ -5,7 +5,8 @@ import stream from 'stream';
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
+  // keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
   scopes: SCOPES,
 });
 
