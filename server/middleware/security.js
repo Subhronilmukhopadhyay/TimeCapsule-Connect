@@ -5,7 +5,6 @@ import rateLimit from 'express-rate-limit';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import authenticate from '../controllers/authController.js';
-import bodyParser from 'body-parser';
 
 const securityMiddleware = (app) => {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -18,14 +17,7 @@ const securityMiddleware = (app) => {
   }));
 
   // Must come before csrf
-  // Add a try-catch block for the cookieParser middleware
-  try {
-    console.log(isProduction);
-    app.use(cookieParser());
-  } catch (error) {
-    console.error('Error applying cookieParser middleware:', error);
-    // You might want to handle this error more gracefully, e.g., by exiting the process
-  }
+  app.use(cookieParser());
 
   // 1. Correctly configure the CSRF middleware's SECRET cookie for production
   const csrfProtection = csrf({
@@ -36,35 +28,24 @@ const securityMiddleware = (app) => {
     }
   });
 
-  // Add a try-catch block for the csrfProtection middleware
-  try {
-    app.use(csrfProtection);
-  } catch (error) {
-    console.error('Error applying CSRF protection middleware:', error);
-    // Again, handle the error as appropriate for your application
-  }
+  app.use(csrfProtection);
 
   app.use(express.json({ limit: '400mb' }));
   app.use(express.urlencoded({ limit: '400mb', extended: true }));
 
   // This endpoint creates the READABLE token for your client-side script
   app.get('/csrf-token', (req, res) => {
-    try {
-      const csrfToken = req.csrfToken();
-      console.log("csrfToken is this: ", csrfToken);
-      // 2. Correctly configure the READABLE token cookie
-      res.cookie('XSRF-TOKEN', csrfToken, {
-        httpOnly: false, // This MUST be false so document.cookie can read it
-        secure: isProduction, // Must match the secret cookie's setting
-        sameSite: isProduction ? 'None' : 'Lax', // Must match the secret cookie's setting
-        maxAge: 3600000, // 1 hour
-      });
+    const csrfToken = req.csrfToken();
 
-      res.status(200).json({ csrfToken: csrfToken }); // Also send it in the body as a fallback
-    } catch (error) {
-      console.error('Error generating CSRF token:', error);
-      res.status(500).json({ error: 'Failed to generate CSRF token.' });
-    }
+    // 2. Correctly configure the READABLE token cookie
+    res.cookie('XSRF-TOKEN', csrfToken, {
+      httpOnly: false, // This MUST be false so document.cookie can read it
+      secure: isProduction, // Must match the secret cookie's setting
+      sameSite: isProduction ? 'None' : 'Lax', // Must match the secret cookie's setting
+      maxAge: 3600000, // 1 hour
+    });
+
+    res.status(200).json({ csrfToken: csrfToken }); // Also send it in the body as a fallback
   });
 
   const limiter = rateLimit({
@@ -73,26 +54,10 @@ const securityMiddleware = (app) => {
     message: 'Too many requests from this IP, please try again later.',
   });
 
-  // Add a try-catch block for the rate limiter
-  try {
-    app.use(limiter);
-  } catch (error) {
-    console.error('Error applying rate limiting middleware:', error);
-  }
+  app.use(limiter);
 
-
-  // Add a try-catch block to the authenticate and the response
   app.get('/me', authenticate, (req, res) => {
-    try {
-      // Check if user object exists to prevent potential errors
-      if (!req.user) {
-        return res.status(401).json({ error: 'Not authenticated.' });
-      }
-      res.status(200).json({ id: req.user.id, email: req.user.email });
-    } catch (error) {
-      console.error('Error in /me endpoint:', error);
-      res.status(500).json({ error: 'Internal server error.' });
-    }
+    res.status(200).json({ id: req.user.id, email: req.user.email });
   });
 };
 
