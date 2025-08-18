@@ -51,7 +51,7 @@ const securityMiddleware = (app) => {
   app.get('/csrf-token', (req, res) => {
     try {
       const csrfToken = req.csrfToken();
-
+      console.log("csrfToken is this: ", csrfToken);
       // 2. Correctly configure the READABLE token cookie
       res.cookie('XSRF-TOKEN', csrfToken, {
         httpOnly: false, // This MUST be false so document.cookie can read it
