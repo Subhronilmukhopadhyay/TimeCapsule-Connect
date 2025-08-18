@@ -3,8 +3,8 @@ import api from './api';
 
 export const loginHandleSubmit = async (email, password, navigate, dispatch, authLogin) => {
   try {
-    await api.get('/csrf-token');
-    console.log("HERE-1");
+    const { data } = await api.get('/csrf-token');
+    localStorage.setItem('csrf', data.csrfToken);
     await new Promise(resolve => setTimeout(resolve, 50)); 
     console.log("Cookie should now be set:", document.cookie);
     const response = await api.post('/api/auth/login', {

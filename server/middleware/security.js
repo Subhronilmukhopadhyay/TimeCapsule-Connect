@@ -36,17 +36,9 @@ const securityMiddleware = (app) => {
   // This endpoint creates the READABLE token for your client-side script
   app.get('/csrf-token', (req, res) => {
     const csrfToken = req.csrfToken();
-
-    // 2. Correctly configure the READABLE token cookie
-    res.cookie('XSRF-TOKEN', csrfToken, {
-      httpOnly: false, // This MUST be false so document.cookie can read it
-      secure: isProduction, // Must match the secret cookie's setting
-      sameSite: isProduction ? 'None' : 'Lax', // Must match the secret cookie's setting
-      maxAge: 3600000, // 1 hour
-    });
-
-    res.status(200).json({ csrfToken: csrfToken }); // Also send it in the body as a fallback
+    res.status(200).json({ csrfToken }); 
   });
+
 
   const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
