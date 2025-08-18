@@ -13,4 +13,4 @@ We welcome contributions to **TimeCapsule Connect**! By participating in this pr
 Please follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a positive and productive environment for all contributors.
 
 ## Reporting Issues
-If you find any bugs or security vulnerabilities, please open an issue in this repository or reach out to us directly at [email@example.com].
+If you find any bugs or security vulnerabilities, please open an issue in this repository or reach out to us directly at [subhronilmukhopadhyay@gmail.com].
