@@ -7,12 +7,12 @@ export const loginHandleSubmit = async (email, password, navigate, dispatch, aut
     const { data } = await api.get('/csrf-token');
     localStorage.setItem('csrf', data.csrfToken);
     await new Promise(resolve => setTimeout(resolve, 50)); 
-    console.log("Cookie should now be set:", data.csrfToken);
+    // console.log("Cookie should now be set:", data.csrfToken);
 
     // Step 2: send login request
     const response = await api.post('/api/auth/login', { email, password });
 
-    console.log("Login successful:", response.data);
+    // console.log("Login successful:", response.data);
 
     if (response.status === 200) {
       dispatch(authLogin({ userData: response.data.user }));

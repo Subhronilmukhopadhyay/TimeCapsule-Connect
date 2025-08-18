@@ -36,7 +36,6 @@ const securityMiddleware = (app) => {
   // This endpoint creates the READABLE token for your client-side script
   app.get('/csrf-token', (req, res) => {
     const csrfToken = req.csrfToken();
-    console.log(csrfToken);
     res.status(200).json({ csrfToken }); 
   });
 

@@ -33,8 +33,7 @@ export const registerUser = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', //production mode
-      // sameSite: 'Strict', //development mode
+      sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'None',
       maxAge: 3600000, 
     });
 
@@ -59,12 +58,11 @@ export const loginUser = async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log("Final logj here");
+    // console.log("Final logj here");
     res.cookie('token', token, {
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'None', //production mode
-      // sameSite: 'Strict', //development mode
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
       maxAge: 3600000,
     });
 

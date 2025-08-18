@@ -22,7 +22,7 @@ function Register() {
       setPass(false);
       return;
     }
-    console.log(email + " " + password);
+    // console.log(email + " " + password);
     registerHandleSubmit(name, username, email, phoneNo, password, confirmPassword, dateOfBirth, navigate);
   };
   

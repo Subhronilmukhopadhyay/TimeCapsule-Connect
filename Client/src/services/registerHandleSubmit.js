@@ -16,7 +16,7 @@ export const registerHandleSubmit = async (
     const { data } = await api.get("/csrf-token");
     localStorage.setItem("csrf", data.csrfToken);
     await new Promise((resolve) => setTimeout(resolve, 50)); // small delay ensures cookie is set
-    console.log("CSRF Token received:", data.csrfToken);
+    // console.log("CSRF Token received:", data.csrfToken);
 
     // Step 2: Submit registration
     const result = await api.post(
@@ -33,7 +33,7 @@ export const registerHandleSubmit = async (
     );
 
     // Step 3: Handle success
-    console.log("Registration successful:", result.data);
+    // console.log("Registration successful:", result.data);
     if (result.status === 201) {
       alert("Registration successful! Please log in.");
       navigate("/dashboard");

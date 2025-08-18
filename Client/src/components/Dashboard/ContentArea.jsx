@@ -12,7 +12,7 @@ const ContentArea = () => {
     const fetchCapsules = async () => {
       try {
         const res = await api.get(`/view/capsule/user`);
-        console.log(res.data);
+        // console.log(res.data);
         setCapsules(res.data);
       } catch (err) {
         setError(err.message || 'Unknown error');
