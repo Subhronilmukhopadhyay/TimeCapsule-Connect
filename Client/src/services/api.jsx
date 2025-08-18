@@ -9,7 +9,7 @@ const api = axios.create({
 api.interceptors.request.use(config => {
   const csrfToken = localStorage.getItem('csrf'); // ✅ safe + reliable
   if (csrfToken) {
-    config.headers['CSRF-Token'] = csrfToken;
+    config.headers['csrf-token'] = csrfToken;
   }
   return config;
 });
