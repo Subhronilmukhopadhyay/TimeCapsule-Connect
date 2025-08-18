@@ -12,7 +12,7 @@ const getCSRFToken = () => {
     const csrfCookie = document.cookie
       .split('; ')
       .find(row => row.startsWith('XSRF-TOKEN=') || row.startsWith('csrftoken='));
-    
+    console.log("HERE CSRF at API:", csrfCookie);
     if (csrfCookie) {
       return csrfCookie.split('=')[1];
     }
