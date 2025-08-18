@@ -6,7 +6,7 @@ const SCOPES = ['https://www.googleapis.com/auth/drive'];
 
 const auth = new google.auth.GoogleAuth({
   credentials: process.env.NODE_ENV === 'production'
-    ? JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON)
+    ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS)
     : undefined,
   keyFile: process.env.NODE_ENV !== 'production'
     ? process.env.GOOGLE_APPLICATION_CREDENTIALS
