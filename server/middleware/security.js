@@ -20,6 +20,7 @@ const securityMiddleware = (app) => {
   // Must come before csrf
   // Add a try-catch block for the cookieParser middleware
   try {
+    console.log(isProduction);
     app.use(cookieParser());
   } catch (error) {
     console.error('Error applying cookieParser middleware:', error);
