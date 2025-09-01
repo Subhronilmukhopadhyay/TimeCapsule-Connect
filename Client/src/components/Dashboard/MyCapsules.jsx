@@ -70,7 +70,7 @@ const MyCapsules = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {unlocked.length ? (
                 unlocked.map((capsule, idx) => (
-                  <Link to={`/view-capsules/${capsule._id || capsule.id}`} key={idx}>
+                  <Link to={`/view-capsule/${capsule._id || capsule.id}`} key={idx}>
                     <CapsuleCard capsule={capsule} />
                   </Link>
                 ))
