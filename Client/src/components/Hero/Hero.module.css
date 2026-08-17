@@ -1,43 +1,281 @@
+/* The old hero relied on /images/hero-bg.jpg, which does not exist in the repo,
+   so white text landed on a blank background. Everything here is drawn in CSS
+   instead — nothing to 404. */
 .hero {
-  background: url('/images/hero-bg.jpg') no-repeat center center/cover;
-  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 148px 24px 96px;
+  background:
+    radial-gradient(1100px 520px at 12% -8%, rgba(74, 110, 245, 0.28), transparent 62%),
+    radial-gradient(820px 460px at 92% 8%, rgba(255, 122, 69, 0.2), transparent 60%),
+    linear-gradient(168deg, #10152b 0%, #1b2450 52%, #232c5e 100%);
+  color: #fff;
+}
+
+/* Faint grid so the dark field does not read as empty. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 30%, transparent 78%);
+  pointer-events: none;
+}
+
+.inner {
+  position: relative;
+  max-width: var(--tc-max);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.copy {
+  max-width: 620px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: #d7dcf5;
+  backdrop-filter: blur(6px);
+}
+
+.eyebrowDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6ee7a8;
+  box-shadow: 0 0 0 4px rgba(110, 231, 168, 0.18);
+}
+
+.title {
+  margin: 22px 0 0;
+  font-size: clamp(2.5rem, 5.2vw, 3.9rem);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.titleAccent {
+  background: linear-gradient(96deg, #8fa8ff 0%, #ffb27a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  margin: 22px 0 0;
+  font-size: 1.09rem;
+  line-height: 1.72;
+  color: #c3cae6;
+  max-width: 56ch;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.primaryCta,
+.secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 26px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+.primaryCta {
+  background: linear-gradient(100deg, var(--tc-primary) 0%, #6b5bf0 100%);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(74, 110, 245, 0.42);
+}
+
+.primaryCta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(74, 110, 245, 0.52);
+}
+
+.secondaryCta {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #eef1ff;
+}
+
+.secondaryCta:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 36px;
+  margin: 46px 0 0;
+  padding: 24px 0 0;
+  list-style: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.stats li {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 3px;
+}
+
+.stats strong {
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stats span {
+  font-size: 0.86rem;
+  color: #a6afd0;
+}
+
+/* ---------- Illustration ---------- */
+
+.visual {
+  position: relative;
+  height: 460px;
+}
+
+.visualGlow {
+  position: absolute;
+  inset: 8% 10%;
+  background: radial-gradient(circle, rgba(122, 150, 255, 0.4), transparent 68%);
+  filter: blur(46px);
+}
+
+.capsuleCard {
+  position: absolute;
+  width: 290px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(6, 10, 28, 0.42);
+  backdrop-filter: blur(14px);
+  animation: float 7s ease-in-out infinite;
+}
+
+.card1 { top: 6%;  right: 6%;  animation-delay: 0s; }
+.card2 { top: 36%; right: 26%; animation-delay: 1.1s; z-index: 2; }
+.card3 { top: 68%; right: 2%;  animation-delay: 2.2s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capsuleCard { animation: none; }
+}
+
+.capsuleHead {
+  display: flex;
   align-items: center;
-  text-align: center;
-  padding: 0 20px;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.lockBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.14);
   color: #fff;
-  margin-top: 80px; /* space for fixed navbar */
 }
 
-.hero h1 {
-  font-size: 3em;
-  margin-bottom: 20px;
+.capsuleMeta {
+  font-size: 11px;
+  color: #b3bcdd;
+  white-space: nowrap;
 }
 
-.hero p {
-  font-size: 1.2em;
-  margin-bottom: 30px;
-}
-
-.ctaButton {
-  background-color: #ff5722;
+.capsuleTitle {
+  margin: 0 0 5px;
+  font-size: 1.04rem;
+  font-weight: 600;
   color: #fff;
-  padding: 15px 30px;
-  border: none;
-  border-radius: 5px;
-  font-size: 1em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.ctaButton:hover {
-  background-color: #e64a19;
+.capsuleDetail {
+  margin: 0 0 15px;
+  font-size: 0.82rem;
+  color: #adb6d8;
 }
 
-@media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2.5em;
+.progressTrack {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.violet .progressFill { background: linear-gradient(90deg, #7c8dff, #a78bfa); }
+.amber  .progressFill { background: linear-gradient(90deg, #ffb27a, #ff7a45); }
+.teal   .progressFill { background: linear-gradient(90deg, #5eead4, #38bdf8); }
+
+@media (max-width: 980px) {
+  .inner {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .visual {
+    height: 400px;
+    max-width: 460px;
+  }
+
+  .card1 { right: 12%; }
+  .card2 { right: 4%; }
+  .card3 { right: 16%; }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: 116px 18px 72px;
+  }
+
+  .visual {
+    display: none;
+  }
+
+  .stats {
+    gap: 24px;
   }
 }

@@ -1,13 +1,17 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test \"utils/**/*.test.js\"",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate": "psql \"$DATABASE_URL\" -f db/migrations/001_google_oauth.sql"
+  },
+  "engines": {
+    "node": ">=18 <24"
   },
   "keywords": [],
   "author": "",

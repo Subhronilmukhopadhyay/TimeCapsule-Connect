@@ -1,29 +1,36 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import styles from "../styles/Login.module.css";
 import InputField from "../components/Form/form";
 import { loginHandleSubmit } from "../services/loginHandleSubmit";
+import { startGoogleLogin } from "../services/googleAuth";
 import { useDispatch } from "react-redux";
 import { login as authLogin } from "../store/slices/authSlice";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // The OAuth callback sends failures back here as ?error=...
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      setErrorMessage(oauthError);
+      searchParams.delete('error');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const result = await loginHandleSubmit(email, password, navigate, dispatch, authLogin);
     if (!result.success) {
-      setErrorMessage(result.message); 
+      setErrorMessage(result.message);
     }
-  };
-
-  const handleGoogleLogin = () => {
-    // Redirect to your backend Google OAuth endpoint
-    window.location.href = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/google`;
   };
 
   return (
@@ -68,9 +75,9 @@ function Login() {
           {/* Google OAuth Section */}
           <div className={styles.oauthLogin}>
             <h3 className={styles.sectionTitle}>Quick Sign In</h3>
-            <button 
-              type="button" 
-              onClick={handleGoogleLogin}
+            <button
+              type="button"
+              onClick={startGoogleLogin}
               className={styles.googleBtn}
             >
               <svg className={styles.googleIcon} viewBox="0 0 24 24">

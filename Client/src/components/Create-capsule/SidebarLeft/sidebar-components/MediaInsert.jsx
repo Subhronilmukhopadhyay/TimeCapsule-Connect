@@ -1,57 +1,58 @@
 import React, { useRef } from 'react';
 import { useSlate } from 'slate-react';
-import { Transforms } from 'slate';
+import { insertMedia } from '../../../../services/withMedia';
 import styles from './MediaInsert.module.css';
+
+/** Matches the ceiling enforced by the chunked upload service. */
+const MAX_UPLOAD_BYTES = 2000 * 1024 * 1024;
 
 const MediaButton = ({ icon, label, type }) => {
   const editor = useSlate();
   const fileInputRef = useRef(null);
-  
+
   const handleInsert = () => {
     // Trigger file input click to open file dialog
     fileInputRef.current.click();
   };
-  
+
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    // Create object URL for the uploaded file
-    const url = URL.createObjectURL(file);
-    
-    switch(type) {
-      case 'image':
-        insertImage(editor, url, file.name);
-        break;
-      case 'video':
-        insertVideo(editor, url, file.name);
-        break;
-      case 'audio':
-        insertAudio(editor, url, file.name);
-        break;
-      case 'file':
-        insertFile(editor, url, file.name);
-        break;
-    }
-    
-    // Reset file input
+    const files = Array.from(event.target.files || []);
+
+    files.forEach((file) => {
+      if (file.size > MAX_UPLOAD_BYTES) {
+        window.alert(`"${file.name}" is larger than the 2GB upload limit.`);
+        return;
+      }
+
+      // The blob URL is a local preview; processContentBeforeSave swaps it for
+      // the uploaded URL when the capsule is saved.
+      insertMedia(editor, {
+        type,
+        url: URL.createObjectURL(file),
+        name: file.name,
+        mime: file.type,
+        size: file.size,
+      });
+    });
+
+    // Reset so picking the same file twice still fires a change event.
     event.target.value = null;
   };
-  
+
   // Determine accepted file types based on the button type
   const getAcceptedFileTypes = () => {
-    switch(type) {
+    switch (type) {
       case 'image': return 'image/*';
       case 'video': return 'video/*';
       case 'audio': return 'audio/*';
-      case 'file': return '.pdf,.doc,.docx,.txt';
+      case 'file': return '.pdf,.doc,.docx,.txt,.rtf,.md,.csv,.xls,.xlsx,.ppt,.pptx,.zip';
       default: return '';
     }
   };
-  
+
   return (
     <>
-      <button className={styles.actionBtn} onClick={handleInsert}>
+      <button className={styles.actionBtn} onClick={handleInsert} type="button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           {icon}
         </svg>
@@ -60,53 +61,13 @@ const MediaButton = ({ icon, label, type }) => {
       <input
         ref={fileInputRef}
         type="file"
+        multiple
         accept={getAcceptedFileTypes()}
         onChange={handleFileChange}
         style={{ display: 'none' }}
       />
     </>
   );
-};
-
-// Updated insert functions to include file names
-const insertImage = (editor, url, name) => {
-  const image = { 
-    type: 'image', 
-    url, 
-    name,
-    children: [{ text: '' }] 
-  };
-  Transforms.insertNodes(editor, image);
-};
-
-const insertVideo = (editor, url, name) => {
-  const video = { 
-    type: 'video', 
-    url, 
-    name,
-    children: [{ text: '' }] 
-  };
-  Transforms.insertNodes(editor, video);
-};
-
-const insertAudio = (editor, url, name) => {
-  const audio = { 
-    type: 'audio', 
-    url, 
-    name,
-    children: [{ text: '' }] 
-  };
-  Transforms.insertNodes(editor, audio);
-};
-
-const insertFile = (editor, url, name) => {
-  const file = { 
-    type: 'file', 
-    url,
-    name, 
-    children: [{ text: '' }] 
-  };
-  Transforms.insertNodes(editor, file);
 };
 
 const MediaInsert = () => {

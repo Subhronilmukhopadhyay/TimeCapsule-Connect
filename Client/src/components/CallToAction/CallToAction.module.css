@@ -1,0 +1,86 @@
+.cta {
+  position: relative;
+  overflow: hidden;
+  padding: 92px 24px;
+  background:
+    radial-gradient(760px 340px at 18% 0%, rgba(74, 110, 245, 0.35), transparent 62%),
+    radial-gradient(620px 320px at 88% 100%, rgba(255, 122, 69, 0.24), transparent 60%),
+    linear-gradient(150deg, #131a36 0%, #1d2652 100%);
+  text-align: center;
+  color: #fff;
+}
+
+.inner {
+  position: relative;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.cta h2 {
+  margin: 0 0 16px;
+  font-size: clamp(1.85rem, 3.6vw, 2.6rem);
+  line-height: 1.18;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.cta p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #c3cae6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin: 32px 0 20px;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+.primary {
+  background: #fff;
+  color: #1b2450;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.24);
+}
+
+.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
+}
+
+.secondary {
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #eef1ff;
+}
+
+.secondary:hover {
+  background: rgba(255, 255, 255, 0.17);
+  transform: translateY(-2px);
+}
+
+.note {
+  font-size: 0.85rem;
+  color: #99a2c6;
+}
+
+@media (max-width: 640px) {
+  .cta {
+    padding: 68px 18px;
+  }
+}

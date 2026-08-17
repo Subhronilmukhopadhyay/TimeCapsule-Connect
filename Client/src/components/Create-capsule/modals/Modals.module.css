@@ -183,6 +183,46 @@
   border-color: #4a6ef5;
 }
 
+/* Host element for the Places PlaceAutocompleteElement web component. It
+   renders its own input, so we only size and align it here. */
+.autocompleteHost {
+  width: 100%;
+}
+
+.autocompleteHost gmp-place-autocomplete,
+.placeAutocomplete {
+  width: 100%;
+  --gmp-mat-color-surface: #fff;
+}
+
+.locationHint {
+  font-size: 13px;
+  color: #b26a00;
+  margin: 0;
+}
+
+.selectedLocation {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #f4f6ff;
+  border: 1px solid #dde3ff;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.selectedLocationLabel {
+  font-weight: 600;
+  color: #4a6ef5;
+  flex-shrink: 0;
+}
+
+.selectedLocationValue {
+  color: #333;
+  word-break: break-word;
+}
+
 .mapPlaceholder {
   margin-top: 10px;
   border: 1px dashed #ccc;

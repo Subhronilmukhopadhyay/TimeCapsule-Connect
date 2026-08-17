@@ -105,6 +105,8 @@ VITE_API_URL=http://localhost:8000/
 
 #### Server `.env` file (`/server/.env`)
 
+See [`server/.env.example`](server/.env.example) for the full, commented list.
+
 ```env
 PORT=8000
 MONGO_URI=your_mongodb_connection_string
@@ -113,7 +115,40 @@ DATABASE_URL=your_postgresql_connection_string
 JWT_SECRET=your_jwt_secret
 GOOGLE_APPLICATION_CREDENTIALS=./config/your_google_credentials.json
 GOOGLE_DRIVE_FOLDER_ID=your_google_drive_folder_id
+
+# Google Sign-In (OAuth 2.0)
+GOOGLE_CLIENT_ID=your_oauth_client_id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/api/auth/google/callback
+SERVER_URL=http://localhost:8000
+CLIENT_URL=http://localhost:5173
 ```
+
+#### Database migration
+
+Google sign-in adds a few columns to the `userlogin` table. Run once:
+
+```bash
+psql "$DATABASE_URL" -f server/db/migrations/001_google_oauth.sql
+```
+
+#### Setting up Google Sign-In
+
+1. In the [Google Cloud console](https://console.cloud.google.com/apis/credentials),
+   create an **OAuth client ID** of type **Web application**.
+2. Add `http://localhost:5173` under **Authorized JavaScript origins**.
+3. Add `http://localhost:8000/api/auth/google/callback` under
+   **Authorized redirect URIs** — it must match `GOOGLE_REDIRECT_URI` exactly,
+   trailing slash included, or Google returns `redirect_uri_mismatch`.
+4. Copy the client ID and secret into `server/.env`.
+
+Signing in with Google using an email address that already has a
+password account **links the two** rather than creating a second account, so
+existing capsules stay accessible either way.
+
+> **Node version:** use Node 18–22. On Node 24+ the `jsonwebtoken` dependency
+> fails to load, because its transitive `buffer-equal-constant-time` package
+> relies on `SlowBuffer`, which Node removed.
 
 4. **Run the Development client**
 
