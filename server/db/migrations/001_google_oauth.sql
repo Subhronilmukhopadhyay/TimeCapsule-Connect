@@ -1,9 +1,12 @@
 -- Adds Google sign-in support to the existing userlogin table.
 --
 -- Run once against the PostgreSQL database pointed at by DATABASE_URL:
---   psql "$DATABASE_URL" -f server/db/migrations/001_google_oauth.sql
+--   cd server && npm run migrate
 --
--- Every statement is idempotent, so re-running it is harmless.
+-- Or paste this file straight into a hosted SQL console (Vercel, Neon,
+-- Supabase). Every statement is idempotent, so re-running it is harmless, and
+-- it only adds columns — the previous release keeps working against a database
+-- that has already been migrated.
 
 -- Google's stable subject id. NULL for accounts that only use a password.
 ALTER TABLE userlogin ADD COLUMN IF NOT EXISTS google_id TEXT;

@@ -126,11 +126,17 @@ CLIENT_URL=http://localhost:5173
 
 #### Database migration
 
-Google sign-in adds a few columns to the `userlogin` table. Run once:
+Google sign-in adds a few columns to the `userlogin` table. With `DATABASE_URL`
+set in `server/.env`, run once from the `server/` directory:
 
 ```bash
-psql "$DATABASE_URL" -f server/db/migrations/001_google_oauth.sql
+npm run migrate
 ```
+
+This uses the `pg` driver, so no local `psql` install is needed, and it works
+against hosted Postgres (Vercel, Neon, Render, Supabase). The migration only
+**adds** columns, so it is safe to run against a database that is still serving
+the previous release — do it before deploying.
 
 #### Setting up Google Sign-In
 

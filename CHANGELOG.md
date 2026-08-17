@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Upgrading requires a database migration.** The password login and
 > registration endpoints now read the `google_id` column, so they will fail
-> against an unmigrated database. Run this before deploying:
+> against an unmigrated database. Run this from `server/` **before** deploying —
+> the migration only adds columns, so the previous release keeps working against
+> a migrated database:
 >
 > ```bash
-> psql "$DATABASE_URL" -f server/db/migrations/001_google_oauth.sql
+> npm run migrate
 > ```
 >
 > Google sign-in additionally needs `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
@@ -37,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   menu, and a multi-column footer.
 - Test suites for the editor (`npm test` in `Client/`) and for the Google
   account-merge logic (`npm test` in `server/`).
+- `npm run migrate` in `server/`, which applies `db/migrations/*.sql` through the
+  `pg` driver — no local `psql` install required.
 - `server/.env.example` documenting every environment variable.
 
 ### Changed
