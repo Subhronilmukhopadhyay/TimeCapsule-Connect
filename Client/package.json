@@ -1,12 +1,13 @@
 {
   "name": "client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test \"src/**/*.test.js\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "axios": "^1.8.4",
     "dompurify": "^3.2.5",
     "framer-motion": "^12.18.1",
+    "is-hotkey": "^0.2.0",
     "js": "^0.1.0",
     "leaflet": "^1.9.4",
     "lottie-react": "^2.4.1",

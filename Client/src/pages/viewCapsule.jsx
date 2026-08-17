@@ -4,6 +4,7 @@ import { Slate, Editable } from 'slate-react';
 import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { loadCapsule } from '../services/capsule-storage';
+import { resolveMediaWidth } from '../services/withMedia';
 import styles from '../styles/View-Capsule.module.css';
 
 // Icons (assuming you have these or can replace with your icon library)
@@ -134,9 +135,28 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
     }
   };
 
+  // Honour the width/alignment the author chose while composing, so a capsule
+  // is read back laid out the way it was written. resolveMediaWidth also keeps
+  // pre-v1.2.0 capsules (raw CSS widths) rendering correctly.
+  const align = element.align || 'center';
+  const resolved = resolveMediaWidth(element.width);
+  const wrapperStyle = {
+    width: resolved.width,
+    maxWidth: '100%',
+    marginLeft: align === 'left' ? 0 : 'auto',
+    marginRight: align === 'right' ? 0 : 'auto',
+  };
+
   return (
-    <div {...attributes} contentEditable={false}>
-      {renderMedia()}
+    <div {...attributes}>
+      <div contentEditable={false} style={wrapperStyle}>
+        {renderMedia()}
+        {element.caption ? (
+          <div className={styles.mediaCaption} style={{ textAlign: align }}>
+            {element.caption}
+          </div>
+        ) : null}
+      </div>
       {children}
     </div>
   );
@@ -758,17 +778,6 @@ const ViewCapsule = ({
 
 export default ViewCapsule;
 
-/**
- * Loads a capsule by ID for only-view
- * @param {string} id - The capsule ID to load
- * @returns {Promise<Object>} - The capsule data
- */
-export const loadViewCapsule = async (id) => {
-  try {
-    const { data } = await api.get(`/view/capsule/${id}`);
-    return data;
-  } catch (error) {
-    console.error('Error loading capsule:', error);
-    throw error;
-  }
-};
+// A duplicate loadViewCapsule used to live here, but it referenced `api`
+// without importing it and would have thrown if anything called it. The
+// working copy is exported from services/capsule-storage.js.

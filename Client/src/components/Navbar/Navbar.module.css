@@ -1,47 +1,214 @@
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 40px;
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
   position: fixed;
   top: 0;
+  left: 0;
   width: 100%;
   z-index: 1000;
+  transition: background-color 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  border-bottom: 1px solid transparent;
+}
+
+/* Transparent over the dark hero, solid once you scroll past it. */
+.navbarScrolled {
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom-color: var(--tc-line);
+  box-shadow: 0 1px 12px rgba(16, 21, 43, 0.06);
+}
+
+.inner {
+  max-width: var(--tc-max);
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .logo {
-  font-size: 1.5em;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.06rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.navbarScrolled .logo {
+  color: var(--tc-ink);
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(120deg, var(--tc-primary), #6b5bf0);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 34px;
 }
 
 .navList {
-  list-style: none;
   display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.navList li {
-  margin-left: 20px;
-}
-
-.navList li a {
-  text-decoration: none;
-  color: #333;
+.navList a {
+  font-size: 0.94rem;
   font-weight: 500;
+  color: rgba(255, 255, 255, 0.82);
+  text-decoration: none;
+  transition: color 0.16s ease;
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
+.navList a:hover {
+  color: #fff;
+}
+
+.navbarScrolled .navList a {
+  color: var(--tc-ink-soft);
+}
+
+.navbarScrolled .navList a:hover {
+  color: var(--tc-primary);
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loginLink {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.navbarScrolled .loginLink {
+  color: var(--tc-ink);
+}
+
+.signupBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 19px;
+  border-radius: 9px;
+  background: linear-gradient(100deg, var(--tc-primary), #6b5bf0);
+  color: #fff;
+  font-size: 0.94rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(74, 110, 245, 0.34);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.signupBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 20px rgba(74, 110, 245, 0.44);
+}
+
+.menuToggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+}
+
+.navbarScrolled .menuToggle {
+  background: var(--tc-surface-alt);
+  color: var(--tc-ink);
+}
+
+@media (max-width: 880px) {
+  .menuToggle {
+    display: inline-flex;
   }
-  
+
+  .nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    background: var(--tc-surface);
+    border-bottom: 1px solid transparent;
+    transition: max-height 0.24s ease, padding 0.24s ease, border-color 0.24s ease;
+  }
+
+  .navOpen {
+    max-height: 420px;
+    padding: 12px 24px 20px;
+    border-bottom-color: var(--tc-line);
+    box-shadow: 0 8px 20px rgba(16, 21, 43, 0.08);
+  }
+
   .navList {
     flex-direction: column;
-    margin-top: 10px;
+    align-items: stretch;
+    gap: 0;
   }
-  
+
   .navList li {
-    margin: 10px 0;
+    border-bottom: 1px solid var(--tc-line);
+  }
+
+  .navList a,
+  .navbarScrolled .navList a {
+    display: block;
+    padding: 13px 0;
+    color: var(--tc-ink);
+  }
+
+  .navActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .loginLink,
+  .navbarScrolled .loginLink {
+    text-align: center;
+    padding: 11px 0;
+    border: 1px solid var(--tc-line);
+    border-radius: 9px;
+    color: var(--tc-ink);
+  }
+
+  .signupBtn {
+    justify-content: center;
+    padding: 12px 0;
   }
 }

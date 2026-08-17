@@ -7,11 +7,12 @@ import LocationInput from './LockModal-components/LocationInput';
 import MapComponent from './LockModal-components/MapComponent';
 import styles from './Modals.module.css';
 
-const libraries = ['places'];
+// 'marker' is needed for AdvancedMarkerElement, 'places' for PlaceAutocompleteElement.
+const libraries = ['places', 'marker'];
 const defaultCenter = { lat: 20.5937, lng: 78.9629 };
 
 const LockModal = ({ onClose }) => {
-  const { capsuleId, capsuleTitle, value, createCapsule } = useEditor();
+  const { capsuleId, capsuleTitle, value, forceSave } = useEditor();
   
   const [lockDate, setLockDate] = useState('');
   const [lockLocation, setLockLocation] = useState('');
@@ -26,69 +27,80 @@ const LockModal = ({ onClose }) => {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries,
+    // PlaceAutocompleteElement ships in the weekly channel.
+    version: 'weekly',
   });
 
-  const onMapClick = useCallback((event) => {
-    try {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-      setMarker({ lat, lng });
-      setMapCenter({ lat, lng });
-
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === 'OK' && results[0]) {
-          setLockLocation(results[0].formatted_address);
-        } else {
-          setLockLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-        }
-      });
-    } catch (err) {
-      setError('Failed to set location from map click');
-      console.error('Error setting location from map:', err);
-    }
-  }, []);
-
-  const useCurrentLocation = useCallback(() => {
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser');
+  /** Reverse-geocode a point, falling back to raw coordinates. */
+  const resolveAddress = useCallback((lat, lng) => {
+    if (!window.google?.maps?.Geocoder) {
+      setLockLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
       return;
     }
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+      if (status === 'OK' && results[0]) {
+        setLockLocation(results[0].formatted_address);
+      } else {
+        setLockLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+      }
+    });
+  }, []);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+  const onMapClick = useCallback(
+    (event) => {
+      try {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
         setMarker({ lat, lng });
         setMapCenter({ lat, lng });
+        setError('');
+        resolveAddress(lat, lng);
+      } catch (err) {
+        setError('Failed to set location from map click');
+        console.error('Error setting location from map:', err);
+      }
+    },
+    [resolveAddress]
+  );
 
-        if (isLoaded && window.google) {
-          const geocoder = new window.google.maps.Geocoder();
-          geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-            if (status === 'OK' && results[0]) {
-              setLockLocation(results[0].formatted_address);
-            } else {
-              setLockLocation(`${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-            }
-          });
+  const useCurrentLocation = useCallback(
+    () =>
+      new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          setError('Geolocation is not supported by your browser');
+          resolve();
+          return;
         }
-      },
-      (err) => {
-        setError(`Error getting current location: ${err.message}`);
-        console.error('Geolocation error:', err);
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
-  }, [isLoaded]);
 
-  const handlePlaceSelected = useCallback((place) => {
-    if (place && place.geometry && place.geometry.location) {
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
-      setLockLocation(place.formatted_address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-      setMarker({ lat, lng });
-      setMapCenter({ lat, lng });
-    }
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            setMarker({ lat, lng });
+            setMapCenter({ lat, lng });
+            setError('');
+            resolveAddress(lat, lng);
+            resolve();
+          },
+          (err) => {
+            setError(`Error getting current location: ${err.message}`);
+            console.error('Geolocation error:', err);
+            resolve();
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      }),
+    [resolveAddress]
+  );
+
+  /** Receives the normalised { address, lat, lng } from LocationInput. */
+  const handlePlaceSelected = useCallback(({ address, lat, lng }) => {
+    if (typeof lat !== 'number' || typeof lng !== 'number') return;
+    setLockLocation(address || `${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+    setMarker({ lat, lng });
+    setMapCenter({ lat, lng });
+    setError('');
   }, []);
 
   const handleSubmit = useCallback(async (e) => {
@@ -110,7 +122,8 @@ const LockModal = ({ onClose }) => {
       
       let id = capsuleId;
       if (!id) {
-        id = await createCapsule();
+        // forceSave creates the capsule when there is no id yet.
+        id = await forceSave();
         if (!id) {
           throw new Error('Failed to save capsule');
         }
@@ -133,15 +146,16 @@ const LockModal = ({ onClose }) => {
       await lockCapsule(id, lockSettings);
       
       alert('Your TimeCapsule has been successfully locked!');
-      
-      window.location.href = '/my-capsules';
+
+      // My Capsules lives under the dashboard shell.
+      window.location.href = '/dashboard/my-capsules';
     } catch (err) {
       setError('Failed to lock the capsule. Please try again.');
       console.error('Error locking capsule:', err);
     } finally {
       setIsSubmitting(false);
     }
-  }, [lockDate, lockLocation, marker, capsuleId, capsuleTitle, value, createCapsule]);
+  }, [lockDate, lockLocation, marker, capsuleId, capsuleTitle, value, forceSave]);
 
   if (loadError) {
     return (

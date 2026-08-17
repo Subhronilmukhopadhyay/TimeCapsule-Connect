@@ -2,6 +2,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { pool } from '../config/db.js';
 import 'dotenv/config';
+
+const isProduction = () => process.env.NODE_ENV === 'production';
+
+/**
+ * One definition of the session cookie for every sign-in path.
+ *
+ * Production serves the client and API from different hosts, so the cookie must
+ * be SameSite=None; Secure. Locally both are on localhost (cookies ignore the
+ * port) where Lax works and None would be rejected outright for lacking Secure.
+ */
+export const sessionCookieOptions = () => ({
+  httpOnly: true,
+  secure: isProduction(),
+  sameSite: isProduction() ? 'None' : 'Lax',
+  maxAge: 3600000,
+});
+
 export const registerUser = async (req, res) => {
   try {
     // console.log(req.body);
@@ -11,10 +28,17 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    const checkUserQuery = 'SELECT id FROM userlogin WHERE email = $1';
+    // Compare case-insensitively so "Ada@x.com" cannot become a second account
+    // alongside "ada@x.com" — the Google merge looks users up the same way.
+    const checkUserQuery = 'SELECT id, google_id FROM userlogin WHERE LOWER(email) = LOWER($1)';
     const existingEmail = await pool.query(checkUserQuery, [email]);
 
     if (existingEmail.rows.length > 0) {
+      if (existingEmail.rows[0].google_id) {
+        return res.status(400).json({
+          error: 'This email already signs in with Google. Use "Continue with Google" instead.',
+        });
+      }
       return res.status(400).json({ error: 'Email already in use' });
     }
 
@@ -30,12 +54,7 @@ export const registerUser = async (req, res) => {
     const newUser = await pool.query(insertUserQuery, [name, username, email, phoneNo, hashedPassword, dateOfBirth]);
     const token = jwt.sign({ id: newUser.rows[0].id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'Strict' : 'None',
-      maxAge: 3600000, 
-    });
+    res.cookie('token', token, sessionCookieOptions());
 
     res.status(201).json({ message: 'User registered successfully', userId: newUser.rows[0].id });
 
@@ -50,23 +69,31 @@ export const loginUser = async (req, res) => {
     // console.log('Received CSRF header:', req.headers['x-csrf-token']);
     const { email, password } = req.body;
 
-    const query = 'SELECT id, username, email, password FROM userlogin WHERE email = $1';
+    const query =
+      'SELECT id, username, email, password, google_id FROM userlogin WHERE LOWER(email) = LOWER($1)';
     const { rows } = await pool.query(query, [email]);
     if (rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
 
     const user = rows[0];
+
+    // Accounts created through Google have no password to compare against.
+    if (!user.password) {
+      return res.status(401).json({
+        error: 'This account uses Google sign-in. Use "Continue with Google" to log in.',
+      });
+    }
+
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) return res.status(401).json({ error: 'Invalid credentials' });
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    // console.log("Final logj here");
-    res.cookie('token', token, {
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
-      maxAge: 3600000,
+    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
     });
 
-    res.json({ message: 'Login successful', user:user });
+    res.cookie('token', token, sessionCookieOptions());
+
+    // Never ship the password hash back to the browser.
+    const { password: _password, ...safeUser } = user;
+    res.json({ message: 'Login successful', user: safeUser });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
@@ -75,10 +102,8 @@ export const loginUser = async (req, res) => {
 
 // Logout route
 export const logout = async (req, res) => {
-  res.clearCookie('token', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Strict',
-  });
+  // clearCookie only matches when the attributes match how it was set.
+  const { maxAge: _maxAge, ...options } = sessionCookieOptions();
+  res.clearCookie('token', options);
   res.status(200).json({ message: 'Logged out successfully' });
 };

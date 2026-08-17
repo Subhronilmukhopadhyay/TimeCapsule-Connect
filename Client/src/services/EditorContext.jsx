@@ -7,6 +7,8 @@ import { withYjs, YjsEditor } from '@slate-yjs/core';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 import { saveCapsule, autoSaveCapsule, loadCapsule } from './capsule-storage';
+import { withMedia } from './withMedia';
+import { withShortcuts } from './withShortcuts';
 
 // Default initial content of the editor when no capsule is loaded or created
 const INITIAL_EDITOR_VALUE = [
@@ -79,9 +81,13 @@ export const EditorProvider = ({
     let editorInstance;
     
     if (isCollaborative && sharedTypeRef.current) {
-      // Create collaborative editor with Yjs
-      editorInstance = withReact(withYjs(createEditor(), sharedTypeRef.current));
-      
+      // Create collaborative editor with Yjs.
+      // withMedia/withShortcuts sit under withReact so they see plain
+      // operations, and Yjs stays closest to the base editor.
+      editorInstance = withReact(
+        withShortcuts(withMedia(withYjs(createEditor(), sharedTypeRef.current)))
+      );
+
       // Custom normalization to ensure empty editor has initial content
       const { normalizeNode } = editorInstance;
       editorInstance.normalizeNode = (entry, options) => {
@@ -93,9 +99,9 @@ export const EditorProvider = ({
       };
     } else {
       // Create standard editor with history
-      editorInstance = withReact(withHistory(createEditor()));
+      editorInstance = withReact(withShortcuts(withMedia(withHistory(createEditor()))));
     }
-    
+
     return editorInstance;
   }, [isCollaborative, sharedTypeRef.current]);
 

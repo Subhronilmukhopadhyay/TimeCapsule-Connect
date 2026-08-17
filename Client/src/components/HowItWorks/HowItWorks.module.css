@@ -1,30 +1,147 @@
-/* How It Works Section */
-.how-it-works {
-    padding: 60px 20px;
-    text-align: center;
-    background-color: white;
+.howItWorks {
+  padding: 96px 24px;
+  background-color: var(--tc-surface-alt);
+  border-top: 1px solid var(--tc-line);
+  border-bottom: 1px solid var(--tc-line);
+}
+
+.inner {
+  max-width: var(--tc-max);
+  margin: 0 auto;
+}
+
+.sectionHead {
+  max-width: 700px;
+  margin: 0 auto 56px;
+  text-align: center;
+}
+
+.kicker {
+  display: inline-block;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: rgba(255, 122, 69, 0.13);
+  color: #d1571f;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sectionHead h2 {
+  margin: 18px 0 14px;
+  font-size: clamp(1.85rem, 3.4vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--tc-ink);
+}
+
+.sectionHead p {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.7;
+  color: var(--tc-ink-soft);
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.step {
+  position: relative;
+  padding: 28px 24px;
+  background: var(--tc-surface);
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  box-shadow: var(--tc-shadow-sm);
+}
+
+/* Connector line between steps on wide screens. */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 50px;
+  right: -11px;
+  width: 10px;
+  height: 2px;
+  background: var(--tc-line);
+}
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.stepIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: rgba(74, 110, 245, 0.11);
+  color: var(--tc-primary);
+}
+
+.stepNumber {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--tc-line);
+  letter-spacing: -0.02em;
+}
+
+.step h3 {
+  margin: 0 0 9px;
+  font-size: 1.1rem;
+  font-weight: 650;
+  color: var(--tc-ink);
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.68;
+  color: var(--tc-ink-soft);
+}
+
+.footerCta {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 30px;
+  border-radius: 10px;
+  background: linear-gradient(100deg, var(--tc-primary) 0%, #6b5bf0 100%);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(74, 110, 245, 0.32);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(74, 110, 245, 0.42);
+}
+
+@media (max-width: 640px) {
+  .howItWorks {
+    padding: 68px 18px;
   }
-  .how-it-works h2 {
-    margin-bottom: 40px;
-    font-size: 2em;
+
+  .step:not(:last-child)::after {
+    display: none;
   }
-  .steps {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .step {
-    flex: 1 1 250px;
-    margin: 20px;
-    padding: 20px;
-  }
-  .step img {
-    width: 80px;
-    margin-bottom: 20px;
-  }
-  .step h3 {
-    margin-bottom: 10px;
-  }
-  .step p {
-    font-size: 0.95em;
-  }
+}

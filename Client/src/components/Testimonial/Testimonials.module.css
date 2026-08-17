@@ -1,22 +1,121 @@
 .testimonials {
-  padding: 60px 20px;
-  background-color: #f1f1f1;
+  padding: 96px 24px;
+  background-color: var(--tc-surface);
+}
+
+.inner {
+  max-width: var(--tc-max);
+  margin: 0 auto;
+}
+
+.sectionHead {
+  max-width: 700px;
+  margin: 0 auto 52px;
   text-align: center;
 }
 
-.testimonials h2 {
-  margin-bottom: 40px;
-  font-size: 2em;
+.kicker {
+  display: inline-block;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: rgba(52, 199, 123, 0.13);
+  color: #1f9d5f;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sectionHead h2 {
+  margin: 18px 0 14px;
+  font-size: clamp(1.85rem, 3.4vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--tc-ink);
+}
+
+.sectionHead p {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.7;
+  color: var(--tc-ink-soft);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 22px;
 }
 
 .testimonialItem {
-  max-width: 600px;
-  margin: 0 auto 30px;
-  font-style: italic;
+  position: relative;
+  margin: 0;
+  padding: 28px 26px;
+  border: 1px solid var(--tc-line);
+  border-radius: var(--tc-radius);
+  background: var(--tc-surface-alt);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.testimonialItem span {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
+.quoteMark {
+  color: rgba(74, 110, 245, 0.22);
+}
+
+.testimonialItem blockquote {
+  margin: 0;
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.72;
+  color: var(--tc-ink);
+}
+
+.testimonialItem figcaption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--tc-line);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.violet { background: rgba(124, 141, 255, 0.18); color: #4f5fd6; }
+.amber  { background: rgba(255, 122, 69, 0.18);  color: #d1571f; }
+.teal   { background: rgba(56, 189, 248, 0.18);  color: #0d8fc4; }
+
+.person {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.person strong {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--tc-ink);
+}
+
+.person span {
+  font-size: 0.82rem;
+  color: var(--tc-muted);
+}
+
+@media (max-width: 640px) {
+  .testimonials {
+    padding: 68px 18px;
+  }
 }

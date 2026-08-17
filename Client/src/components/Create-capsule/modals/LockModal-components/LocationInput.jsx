@@ -1,76 +1,162 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from '../Modals.module.css';
 
+/**
+ * Location picker built on the modern Places UI Kit.
+ *
+ * `google.maps.places.Autocomplete` was deprecated on March 1st 2025 and is no
+ * longer receiving fixes, so this uses `PlaceAutocompleteElement` instead. That
+ * API is a custom element which renders and owns its own <input>, so the text
+ * box cannot be a controlled React input any more. The resolved address is
+ * therefore surfaced in a read-only readout below the search box, which also
+ * keeps it in sync when the user picks a spot by clicking the map or by using
+ * their current location.
+ */
 const LocationInput = ({
   isLoaded,
   lockLocation,
   setLockLocation,
-  useCurrentLocation,
+  // Aliased locally: a `use*` name here trips the rules-of-hooks lint, and this
+  // is an ordinary callback prop rather than a React hook.
+  useCurrentLocation: requestCurrentLocation,
   onPlaceSelected,
 }) => {
-  const inputRef = useRef(null);
-  const autocompleteRef = useRef(null);
+  const containerRef = useRef(null);
+  const elementRef = useRef(null);
+
+  // Keep the latest callbacks in refs so the element is only ever built once.
+  const onPlaceSelectedRef = useRef(onPlaceSelected);
+  const setLockLocationRef = useRef(setLockLocation);
+  onPlaceSelectedRef.current = onPlaceSelected;
+  setLockLocationRef.current = setLockLocation;
+
+  const [initError, setInitError] = useState('');
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
-    if (
-      isLoaded &&
-      inputRef.current &&
-      window.google &&
-      window.google.maps &&
-      window.google.maps.places
-    ) {
+    if (!isLoaded || !containerRef.current) return;
+
+    let cancelled = false;
+    let element = null;
+    let handleSelect = null;
+
+    const buildAutocomplete = async () => {
       try {
-        // Initialize Google Autocomplete
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-          fields: ['formatted_address', 'geometry'],
-          types: ['geocode'],
-        });
+        const { PlaceAutocompleteElement } = await window.google.maps.importLibrary('places');
 
-        // Place selected event
-        autocompleteRef.current.addListener('place_changed', () => {
-          const place = autocompleteRef.current.getPlace();
-          if (!place || !place.geometry) return;
+        if (!PlaceAutocompleteElement) {
+          throw new Error('PlaceAutocompleteElement is unavailable');
+        }
+        // The modal may have closed while the library was loading.
+        if (cancelled || !containerRef.current) return;
 
-          const formattedAddress = place.formatted_address || '';
-          setLockLocation(formattedAddress);
-          onPlaceSelected(place);
-        });
-      } catch (error) {
-        console.error('Error initializing autocomplete:', error);
-      }
-    }
+        element = new PlaceAutocompleteElement();
+        element.setAttribute('placeholder', 'Search for a place, or click the map');
+        element.className = styles.placeAutocomplete;
 
-    return () => {
-      if (autocompleteRef.current) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
+        handleSelect = async (event) => {
+          try {
+            // Current API hands back a prediction; older builds handed back a
+            // Place directly. Support both so a library rollout can't break us.
+            const prediction = event.placePrediction;
+            const place = prediction ? prediction.toPlace() : event.place;
+            if (!place) return;
+
+            await place.fetchFields({
+              fields: ['displayName', 'formattedAddress', 'location'],
+            });
+
+            const location = place.location;
+            if (!location) return;
+
+            const lat = typeof location.lat === 'function' ? location.lat() : location.lat;
+            const lng = typeof location.lng === 'function' ? location.lng() : location.lng;
+
+            const address =
+              place.formattedAddress ||
+              place.displayName ||
+              `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+            setLockLocationRef.current(address);
+            onPlaceSelectedRef.current({ address, lat, lng });
+          } catch (err) {
+            console.error('Error resolving selected place:', err);
+            setInitError('Could not read that place. Try another search.');
+          }
+        };
+
+        element.addEventListener('gmp-select', handleSelect);
+        // Legacy event name, harmless if it never fires.
+        element.addEventListener('gmp-placeselect', handleSelect);
+
+        containerRef.current.appendChild(element);
+        elementRef.current = element;
+        setInitError('');
+      } catch (err) {
+        console.error('Error initializing place autocomplete:', err);
+        setInitError('Place search is unavailable. You can still click the map.');
       }
     };
-  }, [isLoaded, onPlaceSelected, setLockLocation]);
+
+    buildAutocomplete();
+
+    return () => {
+      cancelled = true;
+      if (element) {
+        if (handleSelect) {
+          element.removeEventListener('gmp-select', handleSelect);
+          element.removeEventListener('gmp-placeselect', handleSelect);
+        }
+        element.remove();
+      }
+      elementRef.current = null;
+    };
+  }, [isLoaded]);
+
+  const handleUseCurrentLocation = async () => {
+    setLocating(true);
+    try {
+      await requestCurrentLocation();
+    } finally {
+      setLocating(false);
+    }
+  };
 
   return (
     <div className={styles.locationSelector}>
       <h4>Set Unlock Location</h4>
 
       <div className={styles.locationInputWrapper}>
-        <input
-          ref={inputRef}
-          type="text"
-          className={styles.locationInput}
-          placeholder={isLoaded ? 'Search or click on the map' : 'Loading place search...'}
-          value={lockLocation}
-          onChange={(e) => setLockLocation(e.target.value)}
-          disabled={!isLoaded}
-          required
-        />
+        {isLoaded ? (
+          <div ref={containerRef} className={styles.autocompleteHost} />
+        ) : (
+          <input
+            type="text"
+            className={styles.locationInput}
+            placeholder="Loading place search..."
+            disabled
+            readOnly
+          />
+        )}
+      </div>
+
+      {initError && <p className={styles.locationHint}>{initError}</p>}
+
+      <div className={styles.selectedLocation}>
+        <span className={styles.selectedLocationLabel}>Selected</span>
+        <span className={styles.selectedLocationValue}>
+          {lockLocation || 'No location set yet'}
+        </span>
       </div>
 
       <button
         type="button"
         className={styles.secondaryBtn}
         style={{ marginTop: '10px' }}
-        onClick={useCurrentLocation}
+        onClick={handleUseCurrentLocation}
+        disabled={locating}
       >
-        Use Current Location
+        {locating ? 'Locating...' : 'Use Current Location'}
       </button>
     </div>
   );

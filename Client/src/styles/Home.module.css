@@ -2,4 +2,14 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--tc-surface);
+  color: var(--tc-ink);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.main {
+  flex: 1;
 }
