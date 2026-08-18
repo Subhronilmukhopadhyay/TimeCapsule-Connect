@@ -286,16 +286,21 @@ const CanvasWorkspace = () => {
         }}
         onDrop={handleDrop}
       >
-        <Editable
-          className={styles.canvasWorkspace}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          placeholder="Start writing here..."
-          spellCheck
-          autoFocus
-          onKeyDown={handleKeyDown}
-          onPaste={handlePaste}
-        />
+        {/* Free-positioned media is absolutely placed against this wrapper, and
+            react-rnd bounds drags to it. It lives outside <Editable> so the
+            coordinate system does not depend on Slate forwarding DOM props. */}
+        <div className={styles.sheetPage} data-capsule-sheet="true">
+          <Editable
+            className={styles.canvasWorkspace}
+            renderElement={renderElement}
+            renderLeaf={renderLeaf}
+            placeholder="Start writing here..."
+            spellCheck
+            autoFocus
+            onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
+          />
+        </div>
         {dropActive && <div className={styles.dropHint}>Drop files to add them to your capsule</div>}
       </div>
       <StatusBar />

@@ -4,7 +4,7 @@ import { Slate, Editable } from 'slate-react';
 import { createEditor } from 'slate';
 import { withReact } from 'slate-react';
 import { loadCapsule } from '../services/capsule-storage';
-import { resolveMediaWidth } from '../services/withMedia';
+import { resolveMediaPlacement } from '../services/withMedia';
 import styles from '../styles/View-Capsule.module.css';
 
 // Icons (assuming you have these or can replace with your icon library)
@@ -72,13 +72,17 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
     setHasError(true);
   };
 
-  const renderMedia = () => {
+  const renderMedia = (fill = false) => {
     const url = getDriveThumbnailUrl(element.url);
-    
+    // Free-positioned media is sized by its wrapper, so it fills it.
+    const fitStyle = fill
+      ? { width: '100%', height: '100%', objectFit: 'contain' }
+      : { maxWidth: '100%', height: 'auto' };
+
     switch (mediaType) {
       case 'image':
         return (
-          <div className={styles.imageContainer}>
+          <div className={styles.imageContainer} style={fill ? { width: '100%', height: '100%' } : undefined}>
             {isLoading && <div className={styles.mediaLoading}>Loading image...</div>}
             {hasError && <div className={styles.mediaError}>Failed to load image</div>}
             <img
@@ -86,21 +90,20 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
               alt={element.alt || 'Image'}
               onLoad={handleLoad}
               onError={handleError}
-              style={{ 
+              style={{
                 display: isLoading || hasError ? 'none' : 'block',
-                maxWidth: '100%',
-                height: 'auto'
+                ...fitStyle,
               }}
             />
           </div>
         );
       case 'video':
         return (
-          <div className={styles.videoContainer}>
+          <div className={styles.videoContainer} style={fill ? { width: '100%', height: '100%' } : undefined}>
             <video
               src={url}
               controls
-              style={{ maxWidth: '100%', height: 'auto' }}
+              style={fitStyle}
               onLoadedData={handleLoad}
               onError={handleError}
             >
@@ -135,24 +138,20 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
     }
   };
 
-  // Honour the width/alignment the author chose while composing, so a capsule
-  // is read back laid out the way it was written. resolveMediaWidth also keeps
-  // pre-v1.2.0 capsules (raw CSS widths) rendering correctly.
+  // Honour the placement the author chose while composing, so a capsule is read
+  // back laid out the way it was written — including media that was given a free
+  // position on the page. resolveMediaPlacement also keeps pre-v1.2.0 capsules
+  // (raw CSS widths) rendering correctly.
   const align = element.align || 'center';
-  const resolved = resolveMediaWidth(element.width);
-  const wrapperStyle = {
-    width: resolved.width,
-    maxWidth: '100%',
-    marginLeft: align === 'left' ? 0 : 'auto',
-    marginRight: align === 'right' ? 0 : 'auto',
-  };
+  const { floating, block, media } = resolveMediaPlacement(element);
+  const { isSized: _isSized, ...wrapperStyle } = media;
 
   return (
-    <div {...attributes}>
+    <div {...attributes} style={block}>
       <div contentEditable={false} style={wrapperStyle}>
-        {renderMedia()}
+        {renderMedia(floating)}
         {element.caption ? (
-          <div className={styles.mediaCaption} style={{ textAlign: align }}>
+          <div className={styles.mediaCaption} style={{ textAlign: floating ? 'center' : align }}>
             {element.caption}
           </div>
         ) : null}

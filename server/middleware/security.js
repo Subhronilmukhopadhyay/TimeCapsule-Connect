@@ -5,6 +5,7 @@ import rateLimit from 'express-rate-limit';
 import csrf from 'csurf';
 import cookieParser from 'cookie-parser';
 import authenticate from '../controllers/authController.js';
+import { pool } from '../config/db.js';
 
 const securityMiddleware = (app) => {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -48,8 +49,32 @@ const securityMiddleware = (app) => {
 
   app.use(limiter);
 
-  app.get('/me', authenticate, (req, res) => {
-    res.status(200).json({ id: req.user.id, email: req.user.email });
+  /**
+   * Returns the signed-in user's profile.
+   *
+   * This reads from the database rather than echoing the JWT back, because the
+   * client hydrates its auth state from here. Google sign-in arrives via a
+   * server-side redirect, so no JS runs to populate the store the way the
+   * password login does — without a name and username in this response the
+   * dashboard falls back to showing 'Guest'.
+   */
+  app.get('/me', authenticate, async (req, res) => {
+    try {
+      const { rows } = await pool.query(
+        'SELECT id, name, username, email, avatar_url FROM userlogin WHERE id = $1',
+        [req.user.id]
+      );
+
+      if (rows.length === 0) {
+        // The token is valid but the account no longer exists.
+        return res.status(401).json({ error: 'Account no longer exists' });
+      }
+
+      res.status(200).json(rows[0]);
+    } catch (error) {
+      console.error('Error loading current user:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   });
 };
 

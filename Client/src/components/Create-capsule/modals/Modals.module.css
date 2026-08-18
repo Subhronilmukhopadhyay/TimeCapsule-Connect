@@ -268,3 +268,8 @@
 .secondaryBtn:hover {
   background-color: #e0e0e0;
 }
+
+/* Positioning context so free-positioned media lands correctly in the preview. */
+.previewDocument {
+  position: relative;
+}

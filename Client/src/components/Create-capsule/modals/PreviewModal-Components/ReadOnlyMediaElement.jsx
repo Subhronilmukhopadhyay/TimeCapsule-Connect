@@ -1,30 +1,30 @@
 // components/PreviewArea/ReadOnlyMediaElement.jsx
 import React from 'react';
-import { resolveMediaWidth } from '../../../../services/withMedia';
+import { resolveMediaPlacement } from '../../../../services/withMedia';
 
 /**
- * Preview-side twin of MediaElement. Width handling goes through
- * resolveMediaWidth so capsules saved before v1.2.0 — which stored raw CSS
- * rather than a percentage — still preview the way they were composed.
+ * Preview-side twin of MediaElement.
+ *
+ * Placement goes through resolveMediaPlacement so the preview matches the
+ * editor exactly: free-positioned media lands at its absolute x/y, docked media
+ * keeps its percentage width and alignment, and capsules saved before v1.2.0
+ * (which stored raw CSS widths) still render as they were composed.
  */
 const ReadOnlyMediaElement = ({ attributes, children, element, mediaType }) => {
   const align = element.align || 'center';
-  const resolved = resolveMediaWidth(element.width);
+  const { floating, block, media } = resolveMediaPlacement(element);
+  const { isSized, ...mediaStyle } = media;
 
-  const wrapperStyle = {
-    width: resolved.width,
-    maxWidth: '100%',
-    marginTop: '1em',
-    marginBottom: '1em',
-    marginLeft: align === 'left' ? 0 : 'auto',
-    marginRight: align === 'right' ? 0 : 'auto',
-  };
+  const wrapperStyle = floating
+    ? mediaStyle
+    : { ...mediaStyle, marginTop: '1em', marginBottom: '1em' };
 
-  const mediaStyle = {
+  const innerStyle = {
     display: 'block',
-    width: resolved.isSized ? '100%' : 'auto',
+    width: floating || isSized ? '100%' : 'auto',
+    height: floating || element.h ? '100%' : 'auto',
     maxWidth: '100%',
-    height: 'auto',
+    objectFit: 'contain',
     borderRadius: 6,
   };
 
@@ -32,13 +32,14 @@ const ReadOnlyMediaElement = ({ attributes, children, element, mediaType }) => {
     switch (mediaType) {
       case 'image':
         return (
-          <img src={element.url} alt={element.caption || element.name || 'image'} style={mediaStyle} />
+          <img src={element.url} alt={element.caption || element.name || 'image'} style={innerStyle} />
         );
       case 'video':
-        return <video controls preload="metadata" src={element.url} style={mediaStyle} />;
+        return <video controls preload="metadata" src={element.url} style={innerStyle} />;
       case 'audio':
         return <audio controls preload="metadata" src={element.url} style={{ width: '100%' }} />;
       case 'file':
+      default:
         return (
           <a
             href={element.url}
@@ -58,13 +59,11 @@ const ReadOnlyMediaElement = ({ attributes, children, element, mediaType }) => {
             {element.name || 'Download File'}
           </a>
         );
-      default:
-        return <span>Unsupported media</span>;
     }
   };
 
   return (
-    <div {...attributes}>
+    <div {...attributes} style={block}>
       <div contentEditable={false} style={wrapperStyle}>
         {renderMedia()}
         {element.caption ? (
@@ -74,7 +73,7 @@ const ReadOnlyMediaElement = ({ attributes, children, element, mediaType }) => {
               fontSize: 13,
               color: '#6b7280',
               fontStyle: 'italic',
-              textAlign: align,
+              textAlign: floating ? 'center' : align,
             }}
           >
             {element.caption}
