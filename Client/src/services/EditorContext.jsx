@@ -3,12 +3,14 @@ import React, { createContext, useState, useMemo, useContext, useEffect, useCall
 import { createEditor, Editor, Transforms } from 'slate';
 import { withReact } from 'slate-react';
 import { withHistory } from 'slate-history';
-import { withYjs, YjsEditor } from '@slate-yjs/core';
+import { withYjs, withYHistory, YjsEditor } from '@slate-yjs/core';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 import { saveCapsule, autoSaveCapsule, loadCapsule } from './capsule-storage';
 import { withMedia } from './withMedia';
 import { withShortcuts } from './withShortcuts';
+
+const MEDIA_TYPES = ['image', 'video', 'audio', 'file'];
 
 // Default initial content of the editor when no capsule is loaded or created
 const INITIAL_EDITOR_VALUE = [
@@ -72,6 +74,12 @@ export const EditorProvider = ({
   const lastActivityRef = useRef(Date.now());
   const isEditingRef = useRef(false);
   const activityTimeoutRef = useRef(null);
+  // Media count from the previous change, used to detect insertions/removals.
+  const mediaCountRef = useRef(null);
+  // Throttles the 'is writing' entry so typing does not flood the feed.
+  const lastEditActivityRef = useRef(0);
+  // Guards the one-time 'opened the capsule' entry against effect re-runs.
+  const openedLoggedRef = useRef(null);
   
   // Store previous collaborators to track changes
   const previousCollaboratorsRef = useRef([]);
@@ -84,8 +92,11 @@ export const EditorProvider = ({
       // Create collaborative editor with Yjs.
       // withMedia/withShortcuts sit under withReact so they see plain
       // operations, and Yjs stays closest to the base editor.
+      // withYHistory is required for undo/redo here: slate-history's withHistory
+      // does not understand Yjs operations, so collaborative editing previously
+      // had no history at all and Ctrl+Z did nothing.
       editorInstance = withReact(
-        withShortcuts(withMedia(withYjs(createEditor(), sharedTypeRef.current)))
+        withShortcuts(withMedia(withYHistory(withYjs(createEditor(), sharedTypeRef.current))))
       );
 
       // Custom normalization to ensure empty editor has initial content
@@ -119,15 +130,25 @@ export const EditorProvider = ({
    * Add activity to the feed
    */
   const addActivity = useCallback((user, action, timestamp = Date.now()) => {
+    if (!user) return;
+
     setActivities(prev => {
+      // Effects that re-run were logging the same event repeatedly, which is
+      // why entries appeared twice. Collapse an identical consecutive entry
+      // from the same person within a short window.
+      const last = prev[0];
+      if (last && last.user === user.name && last.action === action && timestamp - last.timestamp < 5000) {
+        return prev;
+      }
+
       const newActivity = {
-        id: Date.now() + Math.random(),
+        id: `${timestamp}-${Math.random()}`,
         time: new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         user: user.name,
         action,
         timestamp
       };
-      
+
       // Keep only the last 50 activities
       const updated = [newActivity, ...prev].slice(0, 50);
       return updated;
@@ -434,8 +455,10 @@ export const EditorProvider = ({
             setCapsuleId(initialId);
             setLastSaved(new Date());
             
-            // Add activity for opening capsule
-            if (currentUser) {
+            // This effect re-runs whenever its callback dependencies change, so
+            // without a guard the same "opened" entry was logged repeatedly.
+            if (currentUser && openedLoggedRef.current !== initialId) {
+              openedLoggedRef.current = initialId;
               addActivity(currentUser, 'opened the capsule');
             }
             
@@ -543,10 +566,41 @@ export const EditorProvider = ({
       setValue(newValue);
     }
     setIsModified(true);
-    
+
     // Update user activity as editing
     updateUserActivity(true);
-  }, [isCollaborative, updateUserActivity]);
+
+    if (!currentUser) return;
+
+    // Watching the media count centrally catches every insertion route —
+    // the toolbar, the sidebar, paste and drag-and-drop — instead of each
+    // call site having to remember to log it.
+    const nodes = (isCollaborative ? editor?.children : newValue) || [];
+    const mediaCount = nodes.filter((node) => MEDIA_TYPES.includes(node.type)).length;
+    const previousCount = mediaCountRef.current;
+    mediaCountRef.current = mediaCount;
+
+    if (previousCount == null) return;
+
+    if (mediaCount > previousCount) {
+      const added = mediaCount - previousCount;
+      addActivity(currentUser, added === 1 ? 'added media' : `added ${added} media items`);
+      return;
+    }
+
+    if (mediaCount < previousCount) {
+      addActivity(currentUser, 'removed media');
+      return;
+    }
+
+    // Typing would otherwise flood the feed, so collapse it into one entry per
+    // minute of continuous writing.
+    const now = Date.now();
+    if (now - lastEditActivityRef.current > 60000) {
+      lastEditActivityRef.current = now;
+      addActivity(currentUser, 'is writing');
+    }
+  }, [isCollaborative, updateUserActivity, currentUser, addActivity, editor]);
 
   /**
    * Handler for when the capsule title changes.
@@ -579,10 +633,12 @@ export const EditorProvider = ({
     return createOrUpdateCapsule(true);
   }, [createOrUpdateCapsule]);
 
-  // Show loading state while collaboration is connecting
-  if (isCollaborative && !collaborationConnected && !error) {
-    return <div className="loading-container">Connecting to collaboration server...</div>;
-  }
+  // No early return here on purpose. Returning a placeholder while the socket
+  // was connecting unmounted the whole editor subtree, and the y-websocket
+  // provider toggles 'status' and 'sync' repeatedly as it connects — so the
+  // editor, sidebars and activity feed were being torn down and rebuilt over
+  // and over. That was the flickering. Consumers read `collaborationConnected`
+  // and show an inline indicator instead.
 
   // The context object value that consumers will use
   const contextValue = {

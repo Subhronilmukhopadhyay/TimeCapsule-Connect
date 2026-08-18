@@ -166,6 +166,21 @@ const CanvasWorkspace = () => {
         }
       }
 
+      // Handled explicitly rather than left to the browser's native undo, which
+      // does not reach Slate reliably and did nothing at all in collaborative
+      // mode. Works for both slate-history and the Yjs undo manager.
+      if (isHotkey('mod+z', event)) {
+        event.preventDefault();
+        editor.undo?.();
+        return;
+      }
+
+      if (isHotkey('mod+shift+z', event) || isHotkey('mod+y', event)) {
+        event.preventDefault();
+        editor.redo?.();
+        return;
+      }
+
       if (isHotkey('mod+k', event)) {
         event.preventDefault();
         const url = window.prompt('Link URL:');

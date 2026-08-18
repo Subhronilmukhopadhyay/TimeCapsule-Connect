@@ -13,6 +13,7 @@ import FloatingToolbar from '../components/Create-capsule/FloatingToolbar/Floati
 import PreviewModal from '../components/Create-capsule/modals/PreviewModal';
 import LockModal from '../components/Create-capsule/modals/LockModal';
 import CollaborationPanel from '../components/Create-capsule/CollaborationPanel/CollaborationPanel';
+import { useSelector } from 'react-redux';
 import { getCurrentUser } from '../services/collabMode';
 import styles from '../styles/Create-Capsule.module.css';
 
@@ -180,21 +181,31 @@ const CreateCapsule = ({
     }
   }, [capsuleId]);
 
+  // The signed-in account, hydrated into the store from /me by the route loader.
+  const authUser = useSelector((state) => state.auth.userData);
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const data = await getCurrentUser(); // Expects { name: '...' }
+
         setCurrentUser({
-          id: 'user-' + Date.now(), // Optional: generate temp id, or fetch actual user ID if returned
-          name: data.name,
+          // The identity must be stable across mounts, tabs and reloads.
+          // This used to be 'user-' + Date.now(), so every session looked like a
+          // different person: awareness could not recognise your own presence,
+          // which is why one user showed up twice and join/leave activity was
+          // logged for yourself.
+          id: authUser?.id != null ? String(authUser.id) : null,
+          name: data.name || authUser?.name || authUser?.username || 'Unknown user',
         });
       } catch (err) {
         console.error('Error fetching current user:', err);
       }
     };
 
-    fetchUser();
-  }, []);
+    // Without a stable id there is no point announcing presence at all.
+    if (authUser?.id != null) fetchUser();
+  }, [authUser?.id, authUser?.name, authUser?.username]);
 
   // Determine effective capsule ID to use in the session
   const effectiveId = capsuleId || idFromUrl || localStorage.getItem('currentCapsuleId');
