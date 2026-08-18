@@ -35,9 +35,17 @@
   z-index: 20;
 }
 
-.canvasWorkspace {
+/* Owns centring, and is the positioning context and drag bounds for
+   free-positioned media. Kept outside <Editable> so the coordinate system does
+   not depend on Slate forwarding DOM attributes. */
+.sheetPage {
   max-width: 820px;
   margin: 0 auto;
+  position: relative;
+}
+
+.canvasWorkspace {
+  width: 100%;
   min-height: 100%;
   background-color: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -361,3 +369,29 @@
     padding: 12px 10px;
   }
 }
+
+/* ---------- Free-positioned (floating) media ---------- */
+
+/* The block still exists in document order so Slate can address it, but it
+   must not occupy any vertical space — the media itself is positioned
+   absolutely against the sheet and is allowed to overlap text. */
+.mediaBlockFloating {
+  height: 0;
+  margin: 0;
+}
+
+.floatingMedia {
+  border-radius: 6px;
+  overflow: visible;
+  z-index: 5;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(16, 21, 43, 0.14);
+  cursor: move;
+}
+
+.floatingMedia img,
+.floatingMedia video {
+  border-radius: 6px;
+  pointer-events: none;
+}
+

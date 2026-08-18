@@ -231,6 +231,57 @@ export const resolveMediaWidth = (width) => {
   return { width: String(width), isSized: true };
 };
 
+/**
+ * True when the media has been given a free position on the page.
+ */
+export const isFloatingMedia = (element) =>
+  typeof element?.x === 'number' && typeof element?.y === 'number';
+
+/**
+ * Resolves a media node to the styles needed to render it, for both the editor
+ * and the read-only views.
+ *
+ * Free-positioned media is absolute against the writing sheet, and its block
+ * must collapse to zero height so it does not also push the text down. Docked
+ * media stays in the flow, sized by percentage and aligned.
+ *
+ * @returns {{floating: boolean, block: object, media: object}}
+ */
+export const resolveMediaPlacement = (element) => {
+  if (isFloatingMedia(element)) {
+    return {
+      floating: true,
+      // Collapses out of the flow; the media overlaps whatever is beneath it.
+      block: { height: 0, margin: 0 },
+      media: {
+        position: 'absolute',
+        left: `${element.x}px`,
+        top: `${element.y}px`,
+        width: element.w ? `${element.w}px` : 'auto',
+        height: element.h ? `${element.h}px` : 'auto',
+        maxWidth: 'none',
+        zIndex: 5,
+      },
+    };
+  }
+
+  const align = element.align || 'center';
+  const resolved = resolveMediaWidth(element.width);
+
+  return {
+    floating: false,
+    block: {},
+    media: {
+      width: resolved.width,
+      height: element.h ? `${element.h}px` : undefined,
+      maxWidth: '100%',
+      marginLeft: align === 'left' ? 0 : 'auto',
+      marginRight: align === 'right' ? 0 : 'auto',
+      isSized: resolved.isSized,
+    },
+  };
+};
+
 /** Maps a File to the media node type used by the editor. */
 export const mediaTypeForFile = (file) => {
   const mime = file.type || '';

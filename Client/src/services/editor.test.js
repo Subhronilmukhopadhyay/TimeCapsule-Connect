@@ -18,6 +18,8 @@ import {
   insertLink,
   isLinkActive,
   resolveMediaWidth,
+  resolveMediaPlacement,
+  isFloatingMedia,
 } from './withMedia.js';
 import { withShortcuts } from './withShortcuts.js';
 import { toggleBlock, toggleAlign, isBlockActive } from './editor-utils.js';
@@ -286,6 +288,71 @@ test('a legacy pixel width from an old capsule is still honoured', () => {
 
 test('a legacy percentage string is passed through', () => {
   assert.deepEqual(resolveMediaWidth('50%'), { width: '50%', isSized: true });
+});
+
+/* ------------------------------------------------------------------ */
+/* Free positioning                                                    */
+/* ------------------------------------------------------------------ */
+
+test('media with no x/y is docked in the text flow', () => {
+  const element = image();
+
+  assert.equal(isFloatingMedia(element), false);
+  const { floating, block, media } = resolveMediaPlacement(element);
+  assert.equal(floating, false);
+  assert.deepEqual(block, {}, 'a docked block occupies normal flow space');
+  assert.equal(media.position, undefined);
+});
+
+test('media with x/y floats at an absolute position', () => {
+  const element = image({ x: 120, y: 340, w: 400, h: 250 });
+
+  assert.equal(isFloatingMedia(element), true);
+  const { floating, block, media } = resolveMediaPlacement(element);
+
+  assert.equal(floating, true);
+  assert.equal(media.position, 'absolute');
+  assert.equal(media.left, '120px');
+  assert.equal(media.top, '340px');
+  assert.equal(media.width, '400px');
+  assert.equal(media.height, '250px');
+  // Critical: the block must collapse or it would also push the text down.
+  assert.equal(block.height, 0);
+});
+
+test('x:0 / y:0 still counts as floating', () => {
+  // A plain truthiness check would treat the top-left corner as "not placed".
+  assert.equal(isFloatingMedia(image({ x: 0, y: 0 })), true);
+});
+
+test('floating survives a round trip through the document', () => {
+  const editor = makeEditor([para('a'), image(), para('b')]);
+
+  // Float it, as the "Free position" button does.
+  Transforms.setNodes(editor, { x: 80, y: 200, w: 300, h: 180 }, { at: [1] });
+  assert.equal(isFloatingMedia(editor.children[1]), true);
+
+  // Dock it again.
+  Transforms.setNodes(editor, { x: null, y: null, w: null, h: null }, { at: [1] });
+  assert.equal(isFloatingMedia(editor.children[1]), false);
+});
+
+test('docking and floating are each a single undo step', () => {
+  const editor = makeEditor([para('a'), image(), para('b')]);
+
+  Transforms.setNodes(editor, { x: 80, y: 200, w: 300, h: 180 }, { at: [1] });
+  assert.equal(isFloatingMedia(editor.children[1]), true);
+
+  editor.undo();
+  assert.equal(isFloatingMedia(editor.children[1]), false, 'one undo un-floats it');
+});
+
+test('a docked image can be resized to a non-proportional height', () => {
+  // The aspect lock is gone: width and height are independent.
+  const { media } = resolveMediaPlacement(image({ width: 50, h: 420 }));
+
+  assert.equal(media.width, '50%');
+  assert.equal(media.height, '420px');
 });
 
 /* ------------------------------------------------------------------ */
