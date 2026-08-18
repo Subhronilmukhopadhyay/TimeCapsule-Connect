@@ -13,10 +13,12 @@ const SIZE_PRESETS = [
   { label: 'Full', value: 100, title: 'Full width' },
 ];
 
-const MIN_WIDTH_PERCENT = 10;
-const MAX_WIDTH_PERCENT = 100;
-const MIN_PX = 60;
+const MIN_PX = 40;
 const DEFAULT_FLOAT_WIDTH = 320;
+
+/** Corner handles resize proportionally; edge handles stretch one axis. */
+const CORNER_DIRECTIONS = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+const RND_CORNERS = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
 
 const formatBytes = (bytes) => {
   if (!bytes && bytes !== 0) return '';
@@ -58,8 +60,11 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
   const wrapperRef = useRef(null);
   const dragStateRef = useRef(null);
 
-  const [draftWidth, setDraftWidth] = useState(null);
+  // Live preview while a resize drag is in flight: { widthPercent, heightPx }.
+  const [draft, setDraft] = useState(null);
   const [loadFailed, setLoadFailed] = useState(false);
+  // react-rnd reads this per mouse move, so corners can lock while edges stretch.
+  const [lockAspect, setLockAspect] = useState(false);
 
   const isFloating = typeof element.x === 'number' && typeof element.y === 'number';
   const storedWidth = element.width ?? null;
@@ -105,6 +110,18 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
 
   /* ---------------- Docked resizing ---------------- */
 
+  /**
+   * Word-style resizing.
+   *
+   * Corner handles scale proportionally, edge handles stretch a single axis, and
+   * the media tracks the pointer 1:1 the whole way. Hold Shift on a corner to
+   * break the ratio.
+   *
+   * Width is persisted as a percentage of the writing column so it stays
+   * responsive, but the percentage keeps two decimals — rounding it to whole
+   * numbers quantised the drag into ~7px jumps on an 820px sheet, which is what
+   * made resizing feel like it moved on its own.
+   */
   const startDockedResize = useCallback(
     (direction) => (event) => {
       event.preventDefault();
@@ -117,15 +134,24 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
       if (!columnWidth) return;
 
       const rect = node.getBoundingClientRect();
+      const isCorner = CORNER_DIRECTIONS.includes(direction);
+      const movesX = isCorner || direction === 'left' || direction === 'right';
+      const movesY = isCorner || direction === 'top' || direction === 'bottom';
+
       dragStateRef.current = {
         direction,
+        isCorner,
+        movesX,
+        movesY,
         startX: event.clientX,
         startY: event.clientY,
         startWidthPx: rect.width,
         startHeightPx: rect.height,
+        // The ratio as currently displayed, so an already-stretched image keeps
+        // its stretch when a corner is dragged.
+        aspect: rect.height > 0 ? rect.width / rect.height : null,
         columnWidth,
-        latestWidth: storedWidth,
-        latestHeight: element.h == null ? null : element.h,
+        result: null,
       };
 
       const onMove = (moveEvent) => {
@@ -135,20 +161,45 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
         const dx = moveEvent.clientX - drag.startX;
         const dy = moveEvent.clientY - drag.startY;
 
-        // Horizontal: left-side handles grow when dragged outward (leftward).
-        if (drag.direction.includes('left') || drag.direction.includes('right')) {
+        let widthPx = drag.startWidthPx;
+        let heightPx = drag.startHeightPx;
+
+        if (drag.isCorner) {
           const signed = drag.direction.includes('left') ? -dx : dx;
-          const nextPx = drag.startWidthPx + signed;
-          const percent = Math.round((nextPx / drag.columnWidth) * 100);
-          drag.latestWidth = Math.min(MAX_WIDTH_PERCENT, Math.max(MIN_WIDTH_PERCENT, percent));
-          setDraftWidth(drag.latestWidth);
+          widthPx = drag.startWidthPx + signed;
+
+          if (drag.aspect && !moveEvent.shiftKey) {
+            // Proportional, as Word does for a corner.
+            heightPx = widthPx / drag.aspect;
+          } else {
+            // Shift breaks the ratio and lets the corner move freely.
+            const signedY = drag.direction.includes('top') ? -dy : dy;
+            heightPx = drag.startHeightPx + signedY;
+          }
+        } else if (drag.movesX) {
+          const signed = drag.direction === 'left' ? -dx : dx;
+          widthPx = drag.startWidthPx + signed;
+          // Height is pinned, so a side handle stretches horizontally.
+          heightPx = drag.startHeightPx;
+        } else {
+          const signed = drag.direction === 'top' ? -dy : dy;
+          heightPx = drag.startHeightPx + signed;
         }
 
-        // Vertical: height is free, which is what unlocks non-proportional resizing.
-        if (drag.direction.includes('top') || drag.direction.includes('bottom')) {
-          const signed = drag.direction.includes('top') ? -dy : dy;
-          drag.latestHeight = Math.max(MIN_PX, Math.round(drag.startHeightPx + signed));
-        }
+        widthPx = Math.min(drag.columnWidth, Math.max(MIN_PX, widthPx));
+        heightPx = Math.max(MIN_PX, heightPx);
+
+        // Two decimals keeps the drag smooth instead of snapping in whole percent.
+        const widthPercent = Math.round((widthPx / drag.columnWidth) * 10000) / 100;
+
+        drag.result = {
+          widthPercent,
+          heightPx: Math.round(heightPx),
+          widthPx: Math.round(widthPx),
+        };
+        // Both axes are previewed, so corner and vertical drags are visible
+        // during the gesture rather than only on release.
+        setDraft(drag.result);
       };
 
       const onUp = () => {
@@ -157,36 +208,34 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
 
-        if (drag) {
-          const next = {};
-          if (drag.latestWidth != null && drag.latestWidth !== storedWidth) {
-            next.width = drag.latestWidth;
-          }
-          const previousHeight = element.h == null ? null : element.h;
-          if (drag.latestHeight != null && drag.latestHeight !== previousHeight) {
-            next.h = drag.latestHeight;
-          }
-          if (Object.keys(next).length > 0) updateNode(next);
+        // One transaction per gesture, so it is a single undo step.
+        if (drag && drag.result) {
+          updateNode({ width: drag.result.widthPercent, h: drag.result.heightPx });
         }
-        setDraftWidth(null);
+        setDraft(null);
       };
 
       window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', onUp);
     },
-    [storedWidth, element.h, updateNode]
+    [updateNode]
   );
 
   /* ---------------- Rendering ---------------- */
 
+  // An explicit height exists while dragging, or once one has been committed.
+  const hasExplicitHeight = draft != null || element.h != null;
+
   const mediaStyle = (fill) => {
-    const sized = resolveMediaWidth(storedWidth).isSized;
+    const sized = draft != null || resolveMediaWidth(storedWidth).isSized;
     return {
       display: 'block',
       width: fill || sized ? '100%' : 'auto',
-      height: fill || element.h ? '100%' : 'auto',
+      height: fill || hasExplicitHeight ? '100%' : 'auto',
       maxWidth: '100%',
-      objectFit: 'contain',
+      // Stretching is intentional on edge handles, so the media must fill the
+      // box rather than letterbox inside it.
+      objectFit: 'fill',
     };
   };
 
@@ -359,7 +408,6 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
             size={{ width: element.w || DEFAULT_FLOAT_WIDTH, height: element.h || 'auto' }}
             minWidth={MIN_PX}
             minHeight={MIN_PX}
-            // Every edge and corner, with no aspect ratio locked.
             enableResizing={{
               top: true,
               right: true,
@@ -370,16 +418,24 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
               bottomLeft: true,
               topLeft: true,
             }}
+            // Word's rule: corners keep the ratio, edges stretch one axis.
+            // react-rnd reads this on every mouse move, so setting it as the
+            // gesture starts is enough.
+            lockAspectRatio={lockAspect}
+            onResizeStart={(_event, resizeDirection) =>
+              setLockAspect(RND_CORNERS.includes(resizeDirection))
+            }
             // Committed once per gesture so undo steps stay meaningful.
             onDragStop={(_event, data) => updateNode({ x: Math.round(data.x), y: Math.round(data.y) })}
-            onResizeStop={(_event, _direction, ref, _delta, position) =>
+            onResizeStop={(_event, _direction, ref, _delta, position) => {
+              setLockAspect(false);
               updateNode({
                 w: Math.round(ref.offsetWidth),
                 h: Math.round(ref.offsetHeight),
                 x: Math.round(position.x),
                 y: Math.round(position.y),
-              })
-            }
+              });
+            }}
           >
             {renderMedia(true)}
             {isActive && toolbar}
@@ -393,11 +449,11 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
   /* ---------------- Docked mode ---------------- */
 
   const resolved =
-    draftWidth != null ? { width: `${draftWidth}%`, isSized: true } : resolveMediaWidth(storedWidth);
+    draft != null ? { width: `${draft.widthPercent}%`, isSized: true } : resolveMediaWidth(storedWidth);
 
   const wrapperStyle = {
     width: resolved.width,
-    height: element.h ? `${element.h}px` : undefined,
+    height: draft != null ? `${draft.heightPx}px` : element.h ? `${element.h}px` : undefined,
     maxWidth: '100%',
     marginLeft: align === 'left' ? 0 : 'auto',
     marginRight: align === 'right' ? 0 : 'auto',
@@ -436,7 +492,11 @@ const MediaElement = ({ attributes, children, element, mediaType }) => {
                   />
                 ))}
 
-              {draftWidth != null && <span className={styles.sizeBadge}>{draftWidth}%</span>}
+              {draft != null && (
+                <span className={styles.sizeBadge}>
+                  {draft.widthPx} × {draft.heightPx}
+                </span>
+              )}
 
               {toolbar}
             </>
