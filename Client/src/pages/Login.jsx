@@ -11,6 +11,9 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  // Kept separate from errorMessage so an OAuth failure renders beside the
+  // Google button instead of under the password field.
+  const [oauthError, setOauthError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,7 +22,7 @@ function Login() {
   useEffect(() => {
     const oauthError = searchParams.get('error');
     if (oauthError) {
-      setErrorMessage(oauthError);
+      setOauthError(oauthError);
       searchParams.delete('error');
       setSearchParams(searchParams, { replace: true });
     }
@@ -88,7 +91,13 @@ function Login() {
               </svg>
               Continue with Google
             </button>
-            
+
+            {oauthError && (
+              <div className={styles.errorMessage} style={{ marginTop: '12px' }}>
+                {oauthError}
+              </div>
+            )}
+
             <div className={styles.oauthBenefits}>
               <p className={styles.benefitText}>✓ Secure & Fast</p>
               <p className={styles.benefitText}>✓ No Password Required</p>
